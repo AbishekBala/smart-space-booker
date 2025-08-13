@@ -46,8 +46,9 @@ const Contact = () => {
                   <div>
                     <h3 className="font-medium mb-1">Address</h3>
                     <p className="text-muted-foreground">
-                      123 Workspace Avenue, Tech District<br />
-                      San Francisco, CA 94107
+                      5th floor, Shalimar Complex,<br />
+                      near Old Ganesh Medical, Kankanady,<br />
+                      Mangaluru, Karnataka 575002
                     </p>
                   </div>
                 </div>
@@ -57,8 +58,8 @@ const Contact = () => {
                   <div>
                     <h3 className="font-medium mb-1">Phone</h3>
                     <p className="text-muted-foreground">
-                      Main: (555) 123-4567<br />
-                      Support: (555) 987-6543
+                      Main: 09980237030<br />
+                      Support: 09980237030
                     </p>
                   </div>
                 </div>
@@ -68,8 +69,8 @@ const Contact = () => {
                   <div>
                     <h3 className="font-medium mb-1">Email</h3>
                     <p className="text-muted-foreground">
-                      General: info@spacebook.com<br />
-                      Bookings: bookings@spacebook.com
+                      General: info@gigspace.com<br />
+                      Bookings: bookings@gigspace.com
                     </p>
                   </div>
                 </div>
@@ -95,11 +96,27 @@ const Contact = () => {
               </CardHeader>
               <CardContent>
                 <p className="text-muted-foreground mb-4">
-                  Follow us on social media for updates and workspace inspiration.
+                  Get in touch through our social media channels.
                 </p>
-                {/* Social media links would go here */}
-                <div className="text-sm text-muted-foreground">
-                  Social media integration coming soon...
+                <div className="flex flex-col space-y-3">
+                  <a href="https://wa.me/919980237030" className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors">
+                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">W</span>
+                    </div>
+                    <span>WhatsApp</span>
+                  </a>
+                  <a href="https://linkedin.com/company/gigspace" className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors">
+                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+                      <span className="text-white font-bold text-sm">in</span>
+                    </div>
+                    <span>LinkedIn</span>
+                  </a>
+                  <a href="mailto:info@gigspace.com" className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors">
+                    <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
+                      <Mail className="h-5 w-5 text-white" />
+                    </div>
+                    <span>Email</span>
+                  </a>
                 </div>
               </CardContent>
             </Card>
@@ -177,12 +194,17 @@ const Contact = () => {
         <div className="mt-16">
           <Card>
             <CardContent className="p-0">
-              <div className="aspect-video bg-muted rounded-lg flex items-center justify-center">
-                <div className="text-center text-muted-foreground">
-                  <MapPin className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                  <p>Interactive map would be integrated here</p>
-                  <p className="text-sm">123 Workspace Avenue, Tech District, San Francisco, CA</p>
-                </div>
+              <div className="aspect-video rounded-lg overflow-hidden">
+                <iframe 
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3145.1192175303563!2d74.85561480948891!3d12.868058217089825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba35b08f42d4aab%3A0x5531aeacffeee4f5!2sGigabyte%20Labs%20Private%20Limited!5e1!3m2!1sen!2sin!4v1755078609619!5m2!1sen!2sin" 
+                  width="100%" 
+                  height="100%" 
+                  style={{border:0}} 
+                  allowFullScreen={true}
+                  loading="lazy" 
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Gigspace Location"
+                ></iframe>
               </div>
             </CardContent>
           </Card>

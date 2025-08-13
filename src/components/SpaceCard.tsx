@@ -61,12 +61,8 @@ const SpaceCard = ({
       </div>
       
       <CardContent className="p-6">
-        <div className="flex justify-between items-start mb-2">
+        <div className="mb-2">
           <h3 className="font-semibold text-lg">{name}</h3>
-          <div className="text-right">
-            <p className="text-2xl font-bold text-primary">${price}</p>
-            <p className="text-sm text-muted-foreground">/day</p>
-          </div>
         </div>
         
         <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
@@ -110,7 +106,7 @@ const SpaceCard = ({
           )}
         </div>
         
-        <Button className="w-full">View Details</Button>
+        <Button className="w-full">Book Now</Button>
       </CardContent>
     </Card>
   );

@@ -24,42 +24,42 @@ const Index = () => {
   const featuredSpaces = [
     {
       id: "1",
-      name: "Executive Office Suite",
+      name: "Office Space",
       type: "Private Office",
       image: privateOfficeImage,
       location: "Downtown",
-      capacity: 4,
-      price: 75,
+      capacity: 20,
+      price: 0,
       rating: 4.8,
       reviews: 124,
       amenities: ["High-speed WiFi", "Coffee & Refreshments", "Printer Access"],
-      description: "Premium private office space perfect for executives and small teams with professional amenities."
+      description: "Premium private office spaces perfect for teams and businesses."
     },
     {
       id: "2",
-      name: "Conference Room A",
+      name: "Meeting Rooms",
       type: "Meeting Room",
       image: meetingRoomImage,
       location: "Tech District",
-      capacity: 12,
-      price: 120,
+      capacity: 15,
+      price: 0,
       rating: 4.9,
       reviews: 87,
-      amenities: ["Video Conferencing", "Whiteboard", "High-speed WiFi"],
-      description: "Fully-equipped meeting space designed for presentations and team collaborations."
+      amenities: ["High-speed WiFi", "Coffee & Refreshments", "Printer Access"],
+      description: "Professional meeting spaces for presentations and collaborations."
     },
     {
       id: "3",
-      name: "Coworking Hotdesk",
+      name: "Coworking",
       type: "Coworking",
       image: coworkingImage,
       location: "Creative Quarter",
-      capacity: 1,
-      price: 25,
+      capacity: 50,
+      price: 0,
       rating: 4.7,
       reviews: 52,
-      amenities: ["High-speed WiFi", "Coffee & Refreshments", "Networking"],
-      description: "Flexible workspace in our vibrant coworking area perfect for freelancers and digital nomads."
+      amenities: ["High-speed WiFi", "Coffee & Refreshments", "Printer Access"],
+      description: "Flexible coworking spaces perfect for individuals and teams."
     }
   ];
 
@@ -72,46 +72,23 @@ const Index = () => {
         <div className="container mx-auto px-4 py-20 lg:py-32">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
             <div className="space-y-8">
-              <div className="space-y-4">
+              <div className="space-y-6">
                 <h1 className="text-4xl lg:text-6xl font-bold text-foreground leading-tight">
-                  Your Space, Your Time
+                  Premium Workspaces <br />
+                  <span className="text-primary">Redefined</span>
                 </h1>
                 <p className="text-xl text-muted-foreground leading-relaxed">
-                  SpaceBook offers premium office spaces, coworking desks, and meeting rooms — flexible, affordable, and tailored to your needs.
+                  Experience flexible, modern office spaces designed for productivity and success. From private offices to collaborative coworking environments.
                 </p>
-              </div>
-              
-              {/* Quick Search */}
-              <Card className="p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Space Type" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all-types">All Types</SelectItem>
-                      <SelectItem value="office">Private Office</SelectItem>
-                      <SelectItem value="coworking">Coworking</SelectItem>
-                      <SelectItem value="meeting">Meeting Room</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Input type="date" />
-                  <Select>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Duration" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="hourly">Hourly</SelectItem>
-                      <SelectItem value="daily">Daily</SelectItem>
-                      <SelectItem value="weekly">Weekly</SelectItem>
-                      <SelectItem value="monthly">Monthly</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Button className="w-full">
-                    Check Availability
+                <div className="flex flex-col sm:flex-row gap-4">
+                  <Button size="lg" className="px-8">
+                    Explore Spaces
+                  </Button>
+                  <Button size="lg" variant="outline" className="px-8">
+                    Schedule Tour
                   </Button>
                 </div>
-              </Card>
+              </div>
             </div>
             
             <div className="relative">
@@ -175,10 +152,6 @@ const Index = () => {
               <h2 className="text-3xl lg:text-4xl font-bold mb-4">Featured Spaces</h2>
               <p className="text-xl text-muted-foreground">Discover our most popular workspaces</p>
             </div>
-            <Button variant="outline" className="hidden md:flex items-center">
-              View All Spaces
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -187,12 +160,6 @@ const Index = () => {
             ))}
           </div>
           
-          <div className="text-center mt-8 md:hidden">
-            <Button variant="outline">
-              View All Spaces
-              <ArrowRight className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
         </div>
       </section>
 
@@ -224,7 +191,7 @@ const Index = () => {
       <section className="py-20">
         <div className="container mx-auto px-4">
           <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Why Choose SpaceBook</h2>
+            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Why Choose Gigspace</h2>
             <p className="text-xl text-muted-foreground">Experience the future of flexible workspace booking</p>
           </div>
           
@@ -264,27 +231,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section */}
-      <section className="py-20 bg-secondary">
-        <div className="container mx-auto px-4 text-center">
-          <div className="max-w-3xl mx-auto space-y-8">
-            <h2 className="text-3xl lg:text-4xl font-bold">
-              Ready to Find Your Perfect Workspace?
-            </h2>
-            <p className="text-xl text-muted-foreground">
-              Flexible, affordable, and tailored to your needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button size="lg" className="px-8">
-                Get Started
-              </Button>
-              <Button size="lg" variant="outline" className="px-8">
-                Learn More
-              </Button>
-            </div>
-          </div>
-        </div>
-      </section>
 
       <Footer />
     </div>

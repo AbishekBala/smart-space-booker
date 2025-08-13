@@ -26,7 +26,7 @@ const Header = () => {
           <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
             <span className="text-primary-foreground font-bold text-lg">S</span>
           </div>
-          <span className="text-xl font-bold text-foreground">SpaceBook</span>
+          <span className="text-xl font-bold text-foreground">Gigspace</span>
         </Link>
 
         {/* Desktop Navigation */}

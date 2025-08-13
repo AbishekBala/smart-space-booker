@@ -23,7 +23,7 @@ const Footer = () => {
               <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-lg">S</span>
               </div>
-              <span className="text-xl font-bold">SpaceBook</span>
+              <span className="text-xl font-bold">Gigspace</span>
             </div>
             <p className="text-muted-foreground">
               Your flexible workspace solution for professionals, teams, and startups.
@@ -87,17 +87,18 @@ const Footer = () => {
               <div className="flex items-start space-x-3">
                 <MapPin className="h-5 w-5 text-muted-foreground mt-0.5" />
                 <div className="text-muted-foreground">
-                  <p>123 Workspace Avenue,</p>
-                  <p>Tech District, San Francisco, CA 94107</p>
+                  <p>5th floor, Shalimar Complex,</p>
+                  <p>near Old Ganesh Medical, Kankanady,</p>
+                  <p>Mangaluru, Karnataka 575002</p>
                 </div>
               </div>
               <div className="flex items-center space-x-3">
                 <Phone className="h-5 w-5 text-muted-foreground" />
-                <span className="text-muted-foreground">(555) 123-4567</span>
+                <span className="text-muted-foreground">09980237030</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Mail className="h-5 w-5 text-muted-foreground" />
-                <span className="text-muted-foreground">info@spacebook.com</span>
+                <span className="text-muted-foreground">info@gigspace.com</span>
               </div>
               <div className="flex items-center space-x-3">
                 <Clock className="h-5 w-5 text-muted-foreground" />
@@ -108,7 +109,7 @@ const Footer = () => {
         </div>
 
         <div className="border-t mt-8 pt-8 text-center text-muted-foreground">
-          <p>&copy; 2023 SpaceBook. All rights reserved.</p>
+          <p>&copy; 2024 Gigspace by Giglabs. All rights reserved.</p>
         </div>
       </div>
     </footer>
