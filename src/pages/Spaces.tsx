@@ -114,9 +114,9 @@ const Spaces = () => {
   const filteredSpaces = allSpaces.filter(space => {
     const matchesSearch = space.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          space.location.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesType = !spaceType || space.type === spaceType;
+    const matchesType = spaceType === "all-types" || !spaceType || space.type === spaceType;
     const matchesLocation = !location || space.location.toLowerCase().includes(location.toLowerCase());
-    const matchesCapacity = !capacity || space.capacity >= parseInt(capacity);
+    const matchesCapacity = capacity === "any-size" || !capacity || space.capacity >= parseInt(capacity);
     const matchesPrice = space.price >= priceRange[0] && space.price <= priceRange[1];
 
     return matchesSearch && matchesType && matchesLocation && matchesCapacity && matchesPrice;
@@ -154,7 +154,7 @@ const Spaces = () => {
                     <SelectValue placeholder="Space Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">All Types</SelectItem>
+                    <SelectItem value="all-types">All Types</SelectItem>
                     <SelectItem value="Private Office">Private Office</SelectItem>
                     <SelectItem value="Coworking">Coworking</SelectItem>
                     <SelectItem value="Meeting Room">Meeting Room</SelectItem>
@@ -165,7 +165,7 @@ const Spaces = () => {
                     <SelectValue placeholder="Capacity" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">Any Size</SelectItem>
+                    <SelectItem value="any-size">Any Size</SelectItem>
                     <SelectItem value="1">1+ People</SelectItem>
                     <SelectItem value="4">4+ People</SelectItem>
                     <SelectItem value="8">8+ People</SelectItem>
@@ -322,9 +322,9 @@ const Spaces = () => {
                 </div>
                 <Button variant="outline" onClick={() => {
                   setSearchTerm("");
-                  setSpaceType("");
+                  setSpaceType("all-types");
                   setLocation("");
-                  setCapacity("");
+                  setCapacity("any-size");
                   setPriceRange([0, 200]);
                 }}>
                   Clear All Filters

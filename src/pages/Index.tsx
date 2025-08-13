@@ -89,6 +89,7 @@ const Index = () => {
                       <SelectValue placeholder="Space Type" />
                     </SelectTrigger>
                     <SelectContent>
+                      <SelectItem value="all-types">All Types</SelectItem>
                       <SelectItem value="office">Private Office</SelectItem>
                       <SelectItem value="coworking">Coworking</SelectItem>
                       <SelectItem value="meeting">Meeting Room</SelectItem>
