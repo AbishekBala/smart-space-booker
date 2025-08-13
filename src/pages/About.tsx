@@ -14,111 +14,83 @@ const About = () => {
       <main className="container mx-auto px-4 py-8">
         {/* Hero Section */}
         <div className="text-center mb-16">
-          <Badge variant="secondary" className="mb-4">About Gigspace</Badge>
+          <Badge variant="secondary" className="mb-4">About GigLabs</Badge>
           <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-6">
-            Premium Workspace Solutions by Giglabs
+            Premium Workspace Solutions in Mangaluru
           </h1>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed">
-            Giglabs provides premium office spaces for flexible usage through Gigspace - transforming how businesses 
-            and professionals experience workspace solutions.
+            GigLabs provides premium workspace solutions including private office spaces, meeting rooms, 
+            and coworking areas designed for modern businesses and professionals.
           </p>
         </div>
 
-        {/* Introduction Section */}
+        {/* About GigLabs Section */}
         <div className="mb-16">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="text-3xl font-bold text-foreground mb-6">Introduction</h2>
+              <h2 className="text-3xl font-bold text-foreground mb-6">What is GigLabs?</h2>
               <div className="space-y-4 text-muted-foreground">
                 <p>
-                  Gigspace by Giglabs offers premium office spaces designed for modern businesses seeking flexibility 
-                  and professional environments. Our workspace solutions cater to companies of all sizes, from startups 
-                  to established enterprises.
+                  GigLabs is a premium workspace provider located in the heart of Mangaluru, offering flexible 
+                  office solutions for businesses and professionals. We specialize in creating productive environments 
+                  that adapt to your specific needs.
                 </p>
                 <p>
-                  We understand that traditional office leases don't always fit the dynamic nature of today's business 
-                  landscape. That's why we've created flexible workspace options that adapt to your changing needs.
+                  Located at Shalimar Complex, Kankanady, our modern facility provides three distinct workspace 
+                  solutions: private office spaces, professional meeting rooms, and collaborative coworking areas.
+                </p>
+                <p>
+                  Whether you're a startup, freelancer, or established business, GigLabs provides the professional 
+                  environment and amenities you need to succeed.
                 </p>
               </div>
             </div>
             <div className="relative">
               <img 
                 src="/src/assets/coworking-space.jpg" 
-                alt="Modern coworking space with professionals collaborating"
+                alt="Modern GigLabs workspace with professionals collaborating"
                 className="rounded-lg shadow-lg w-full"
               />
             </div>
           </div>
         </div>
 
-        {/* Who We Are Section */}
+        {/* Our Workspace Solutions */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-8">Who We Are</h2>
-          <div className="max-w-4xl mx-auto text-center">
-            <p className="text-lg text-muted-foreground leading-relaxed">
-              Giglabs is a forward-thinking company specializing in workspace solutions that bridge the gap between 
-              traditional office spaces and the evolving needs of modern businesses. Through our Gigspace brand, we 
-              deliver premium, flexible office environments that enhance productivity and foster growth.
-            </p>
-          </div>
-        </div>
-
-        {/* Our Story Section */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-8">Our Story</h2>
-          <div className="max-w-4xl mx-auto">
-            <div className="space-y-6 text-muted-foreground">
-              <p>
-                Founded with a vision to revolutionize the workspace industry, Giglabs recognized the growing demand 
-                for flexible, premium office solutions. As businesses increasingly sought alternatives to long-term 
-                leases and rigid office structures, we saw an opportunity to create something better.
-              </p>
-              <p>
-                Starting from our flagship location in Mangaluru, we've built our reputation on providing exceptional 
-                workspace experiences that combine the professionalism of traditional offices with the flexibility 
-                that modern businesses require.
-              </p>
-              <p>
-                Today, Gigspace stands as a testament to our commitment to innovation in workspace design and 
-                customer service excellence.
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* What We Do Section */}
-        <div className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-8">What We Do</h2>
+          <h2 className="text-3xl font-bold text-foreground text-center mb-8">Our Workspace Solutions</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <Card>
+            <Card className="h-full">
               <CardContent className="pt-8">
                 <div className="text-center">
                   <Building2 className="h-12 w-12 text-primary mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-4">Office Spaces</h3>
+                  <h3 className="text-xl font-semibold mb-4">Private Office Spaces</h3>
                   <p className="text-muted-foreground">
-                    Premium private offices for businesses requiring dedicated workspace with professional amenities.
+                    Fully furnished private offices perfect for teams and businesses needing dedicated workspace with 
+                    high-speed internet, security, and professional amenities.
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="h-full">
               <CardContent className="pt-8">
                 <div className="text-center">
                   <Users className="h-12 w-12 text-primary mx-auto mb-6" />
                   <h3 className="text-xl font-semibold mb-4">Meeting Rooms</h3>
                   <p className="text-muted-foreground">
-                    Professional meeting spaces equipped with modern technology for presentations and collaborations.
+                    Professional meeting spaces equipped with presentation technology, whiteboards, and comfortable 
+                    seating for productive business discussions.
                   </p>
                 </div>
               </CardContent>
             </Card>
-            <Card>
+            <Card className="h-full">
               <CardContent className="pt-8">
                 <div className="text-center">
                   <Lightbulb className="h-12 w-12 text-primary mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-4">Coworking</h3>
+                  <h3 className="text-xl font-semibold mb-4">Coworking Areas</h3>
                   <p className="text-muted-foreground">
-                    Flexible coworking environments that foster creativity and networking among professionals.
+                    Open collaborative spaces ideal for freelancers, remote workers, and small teams seeking 
+                    a professional environment with networking opportunities.
                   </p>
                 </div>
               </CardContent>
@@ -126,80 +98,42 @@ const About = () => {
           </div>
         </div>
 
-        {/* Mission, Vision, Values */}
+        {/* Our Mission */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Our Foundation</h2>
-          <div className="grid lg:grid-cols-3 gap-8">
-            <Card>
-              <CardContent className="pt-8">
-                <div className="text-center">
-                  <Target className="h-12 w-12 text-primary mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-4">Our Mission</h3>
-                  <p className="text-muted-foreground">
-                    To provide flexible, premium workspace solutions that empower businesses to thrive and grow 
-                    while maintaining the highest standards of professionalism and service.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-8">
-                <div className="text-center">
-                  <Lightbulb className="h-12 w-12 text-primary mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-4">Our Vision</h3>
-                  <p className="text-muted-foreground">
-                    To become the leading provider of premium flexible workspace solutions, setting new standards 
-                    for office environments that adapt to the future of work.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
-            <Card>
-              <CardContent className="pt-8">
-                <div className="text-center">
-                  <Heart className="h-12 w-12 text-primary mx-auto mb-6" />
-                  <h3 className="text-xl font-semibold mb-4">Our Values</h3>
-                  <p className="text-muted-foreground">
-                    Excellence in service, flexibility in solutions, integrity in relationships, and innovation 
-                    in workspace design and technology.
-                  </p>
-                </div>
-              </CardContent>
-            </Card>
+          <div className="max-w-4xl mx-auto text-center">
+            <h2 className="text-3xl font-bold text-foreground mb-8">Our Mission</h2>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              To provide flexible, premium workspace solutions that empower businesses and professionals to thrive. 
+              We are committed to creating productive environments that combine professionalism with the flexibility 
+              that modern work demands.
+            </p>
           </div>
         </div>
 
-        {/* Why Choose Us */}
+        {/* Why Choose GigLabs */}
         <div className="mb-16">
-          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Why Choose Gigspace</h2>
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <h2 className="text-3xl font-bold text-foreground text-center mb-12">Why Choose GigLabs</h2>
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className="text-center">
+              <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <MapPin className="h-8 w-8 text-primary" />
+              </div>
+              <h3 className="font-semibold mb-3">Prime Location</h3>
+              <p className="text-muted-foreground">Located in Kankanady, Mangaluru with excellent connectivity and easy access to business districts.</p>
+            </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Building2 className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Premium Locations</h3>
-              <p className="text-sm text-muted-foreground">Strategic business locations with excellent connectivity and amenities.</p>
+              <h3 className="font-semibold mb-3">Modern Facilities</h3>
+              <p className="text-muted-foreground">Fully equipped workspaces with high-speed internet, modern furniture, and professional amenities.</p>
             </div>
             <div className="text-center">
               <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
                 <Users className="h-8 w-8 text-primary" />
               </div>
-              <h3 className="font-semibold mb-2">Professional Community</h3>
-              <p className="text-sm text-muted-foreground">Connect with like-minded professionals and growing businesses.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <Lightbulb className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold mb-2">Flexible Solutions</h3>
-              <p className="text-sm text-muted-foreground">Customizable workspace options that scale with your business needs.</p>
-            </div>
-            <div className="text-center">
-              <div className="w-16 h-16 bg-primary/10 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <Award className="h-8 w-8 text-primary" />
-              </div>
-              <h3 className="font-semibold mb-2">Quality Service</h3>
-              <p className="text-sm text-muted-foreground">Dedicated support and maintenance ensuring exceptional workspace experiences.</p>
+              <h3 className="font-semibold mb-3">Flexible Booking</h3>
+              <p className="text-muted-foreground">Hourly, daily, or monthly bookings available to suit your specific business requirements.</p>
             </div>
           </div>
         </div>
@@ -238,13 +172,13 @@ const About = () => {
 
         {/* Call to Action */}
         <div className="text-center bg-primary/5 rounded-2xl p-12">
-          <h2 className="text-3xl font-bold text-foreground mb-6">Ready to Experience Premium Workspace?</h2>
+          <h2 className="text-3xl font-bold text-foreground mb-6">Ready to Book Your Workspace?</h2>
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
-            Join businesses that have discovered the Gigspace advantage. Flexible, professional, and designed for success.
+            Experience the GigLabs difference. Professional workspaces designed for productivity and success.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg">
-              <Link to="/coworking">Explore Spaces</Link>
+              <Link to="/office-booking">Book Office Space</Link>
             </Button>
             <Button variant="outline" size="lg" asChild>
               <Link to="/contact">Contact Us</Link>
