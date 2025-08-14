@@ -1,73 +1,128 @@
-# Welcome to your Lovable project
+# GigSpace - Premium Workspace Booking Platform
 
-## Project info
+A modern, responsive web application for booking premium workspaces including coworking spaces, private offices, and meeting rooms.
 
-**URL**: https://lovable.dev/projects/f090319a-d38a-43cf-a216-66f2921b6e49
+## 🚀 Features
 
-## How can I edit this code?
+- **Workspace Search & Booking**: Find and book various types of workspaces
+- **Responsive Design**: Works seamlessly on desktop, tablet, and mobile devices
+- **Modern UI/UX**: Built with React, TypeScript, and Tailwind CSS
+- **Smooth Scrolling**: Enhanced user experience with smooth page transitions
+- **Professional Design**: Clean, modern interface for workspace management
 
-There are several ways of editing your application.
+## 🛠️ Tech Stack
 
-**Use Lovable**
+- **Frontend**: React 18 with TypeScript
+- **Styling**: Tailwind CSS with shadcn/ui components
+- **Build Tool**: Vite
+- **Routing**: React Router DOM
+- **State Management**: React Hooks
+- **Icons**: Lucide React
+- **Forms**: React Hook Form with Zod validation
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/f090319a-d38a-43cf-a216-66f2921b6e49) and start prompting.
+## 📁 Project Structure
 
-Changes made via Lovable will be committed automatically to this repo.
+```
+src/
+├── components/          # Reusable UI components
+│   ├── ui/             # shadcn/ui components
+│   ├── Header.tsx      # Navigation header
+│   ├── Footer.tsx      # Site footer
+│   └── SpaceCard.tsx   # Workspace display card
+├── pages/              # Application pages
+│   ├── Index.tsx       # Homepage
+│   ├── Coworking.tsx   # Coworking spaces
+│   ├── MeetingRooms.tsx # Meeting room booking
+│   ├── OfficeBooking.tsx # Private office booking
+│   ├── Spaces.tsx      # All spaces overview
+│   ├── SpaceDetails.tsx # Individual space details
+│   ├── About.tsx       # Company information
+│   └── Contact.tsx     # Contact form
+├── hooks/              # Custom React hooks
+├── lib/                # Utility functions
+└── assets/             # Images and static files
+```
 
-**Use your preferred IDE**
+## 🚀 Getting Started
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Prerequisites
+- Node.js 18+ 
+- npm or yarn
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+### Installation
+1. Clone the repository
+```bash
+git clone <repository-url>
+cd smart-space-booker
+```
 
-Follow these steps:
+2. Install dependencies
+```bash
+npm install
+```
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
+3. Start development server
+```bash
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
+4. Open your browser and navigate to `http://localhost:8080`
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+## 📱 Available Pages
 
-**Use GitHub Codespaces**
+- **Home** (`/`) - Overview of services and featured workspaces
+- **Coworking** (`/coworking`) - Coworking space options and booking
+- **Meeting Rooms** (`/meeting-rooms`) - Meeting room availability and booking
+- **Office Booking** (`/office-booking`) - Private office spaces and booking
+- **Spaces** (`/spaces`) - Complete listing of all available workspaces
+- **About** (`/about`) - Company information and mission
+- **Contact** (`/contact`) - Contact form and information
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+## 🎨 Design System
 
-## What technologies are used for this project?
+The application uses a consistent design system with:
+- **Color Palette**: Professional blue theme with proper contrast
+- **Typography**: Clear hierarchy and readable fonts
+- **Components**: Reusable UI components for consistency
+- **Responsive**: Mobile-first design approach
+- **Accessibility**: ARIA labels and keyboard navigation support
 
-This project is built with:
+## 🔧 Available Scripts
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+- `npm run dev` - Start development server
+- `npm run build` - Build for production
+- `npm run build:dev` - Build for development
+- `npm run lint` - Run ESLint
+- `npm run preview` - Preview production build
 
-## How can I deploy this project?
+## 🌟 Key Features
 
-Simply open [Lovable](https://lovable.dev/projects/f090319a-d38a-43cf-a216-66f2921b6e49) and click on Share -> Publish.
+### Workspace Management
+- Search and filter workspaces by type, location, and capacity
+- Real-time availability checking
+- Detailed workspace information and amenities
+- Professional image galleries
 
-## Can I connect a custom domain to my Lovable project?
+### Booking System
+- Intuitive booking forms
+- Date and time selection
+- Space type categorization
+- Booking confirmation system
 
-Yes, you can!
+### User Experience
+- Smooth page transitions
+- Responsive design for all devices
+- Professional animations and hover effects
+- Easy navigation between sections
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+## 📄 License
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+This project is proprietary software for GigSpace workspace booking platform.
+
+## 🤝 Contributing
+
+This is a private project for GigSpace. For any questions or support, please contact the development team.
+
+---
+
+**GigSpace** - Premium Workspace Solutions in Mangaluru
