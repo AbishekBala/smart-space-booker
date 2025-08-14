@@ -8,6 +8,7 @@ import { Calendar } from "@/components/ui/calendar";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { 
   MapPin, 
   Users, 
@@ -29,6 +30,9 @@ import meetingRoomImage from "@/assets/meeting-room.jpg";
 import coworkingImage from "@/assets/coworking-space.jpg";
 
 const SpaceDetails = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());

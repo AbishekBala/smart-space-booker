@@ -3,341 +3,248 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Video, Users, Presentation, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Star, MapPin, Users, Video, Presentation } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const MeetingRooms = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    company: "",
-    roomType: "",
-    attendees: "",
-    timeSlot: "",
-    duration: "",
-    equipment: "",
-    requirements: ""
+    spaceType: "",
+    date: "",
+    timeFrom: "",
+    timeUntil: ""
   });
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Meeting Room Booked Successfully",
-      description: "Your meeting room has been reserved. Check your email for confirmation details.",
+      title: "Availability Checked",
+      description: "Available meeting rooms have been updated based on your search criteria.",
     });
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      roomType: "",
-      attendees: "",
-      timeSlot: "",
-      duration: "",
-      equipment: "",
-      requirements: ""
-    });
-    setSelectedDate(undefined);
   };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const meetingRooms = [
+    {
+      id: 1,
+      name: "Small Meeting Room",
+      image: "/src/assets/meeting-room.jpg",
+      description: "Perfect for 4-8 people with HD video conferencing and 55\" 4K display.",
+      rating: 4.7,
+      reviews: 89,
+      price: 50,
+      type: "Meeting Room",
+      capacity: "4-8 people",
+      amenities: ["HD Video Conferencing", "55\" 4K Display", "Whiteboard"]
+    },
+    {
+      id: 2,
+      name: "Large Conference Room",
+      image: "/src/assets/meeting-room.jpg",
+      description: "Ideal for 10-20 people with premium AV equipment and 75\" interactive display.",
+      rating: 4.9,
+      reviews: 156,
+      price: 120,
+      type: "Conference Room",
+      capacity: "10-20 people",
+      amenities: ["Premium AV Equipment", "75\" Interactive Display", "Recording Equipment"]
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
+          {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              Book Professional Meeting Rooms
+              Find Your Perfect Workspace
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Modern meeting rooms equipped with the latest technology. Perfect for presentations, 
-              client meetings, and team collaborations.
+              Search available spaces and book your next productive environment with ease.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Room Types */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">Available Meeting Rooms</h2>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Small Meeting Room
-                  </CardTitle>
-                  <CardDescription>Perfect for 4-8 people</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>4-8 people capacity</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4" />
-                      <span>HD video conferencing</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Presentation className="h-4 w-4" />
-                      <span>55" 4K display</span>
-                    </div>
-                  </div>
-                  <p className="font-semibold text-primary mt-4">$50/hour</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5 text-primary" />
-                    Large Conference Room
-                  </CardTitle>
-                  <CardDescription>Ideal for 10-20 people</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>10-20 people capacity</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4" />
-                      <span>Premium AV equipment</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Presentation className="h-4 w-4" />
-                      <span>75" interactive display</span>
-                    </div>
-                  </div>
-                  <p className="font-semibold text-primary mt-4">$120/hour</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Presentation className="h-5 w-5 text-primary" />
-                    Executive Boardroom
-                  </CardTitle>
-                  <CardDescription>Premium space for 8-12 executives</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>8-12 people capacity</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>Corner office views</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Video className="h-4 w-4" />
-                      <span>Executive-level amenities</span>
-                    </div>
-                  </div>
-                  <p className="font-semibold text-primary mt-4">$200/hour</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Booking Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Book Your Meeting Room</CardTitle>
-                <CardDescription>
-                  Reserve the perfect meeting space for your team or clients.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Full Name *</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        required
-                        aria-describedby="name-description"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        required
-                        aria-describedby="email-description"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="company">Company Name</Label>
-                      <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) => handleInputChange("company", e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="room-type">Room Type *</Label>
-                      <Select onValueChange={(value) => handleInputChange("roomType", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select room type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="small-meeting">Small Meeting Room (4-8)</SelectItem>
-                          <SelectItem value="large-conference">Large Conference Room (10-20)</SelectItem>
-                          <SelectItem value="executive-boardroom">Executive Boardroom (8-12)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="attendees">Expected Attendees *</Label>
-                      <Select onValueChange={(value) => handleInputChange("attendees", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Number of attendees" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="2-4">2-4 people</SelectItem>
-                          <SelectItem value="5-8">5-8 people</SelectItem>
-                          <SelectItem value="9-12">9-12 people</SelectItem>
-                          <SelectItem value="13-20">13-20 people</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Meeting Date *</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                            aria-label="Select date"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={selectedDate}
-                            onSelect={setSelectedDate}
-                            disabled={(date) => date < new Date()}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <div>
-                      <Label htmlFor="time-slot">Time Slot *</Label>
-                      <Select onValueChange={(value) => handleInputChange("timeSlot", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select time" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="09:00">9:00 AM</SelectItem>
-                          <SelectItem value="10:00">10:00 AM</SelectItem>
-                          <SelectItem value="11:00">11:00 AM</SelectItem>
-                          <SelectItem value="12:00">12:00 PM</SelectItem>
-                          <SelectItem value="13:00">1:00 PM</SelectItem>
-                          <SelectItem value="14:00">2:00 PM</SelectItem>
-                          <SelectItem value="15:00">3:00 PM</SelectItem>
-                          <SelectItem value="16:00">4:00 PM</SelectItem>
-                          <SelectItem value="17:00">5:00 PM</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="duration">Duration *</Label>
-                      <Select onValueChange={(value) => handleInputChange("duration", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Meeting duration" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-hour">1 Hour</SelectItem>
-                          <SelectItem value="2-hours">2 Hours</SelectItem>
-                          <SelectItem value="3-hours">3 Hours</SelectItem>
-                          <SelectItem value="4-hours">4 Hours</SelectItem>
-                          <SelectItem value="full-day">Full Day</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="equipment">Required Equipment</Label>
-                      <Select onValueChange={(value) => handleInputChange("equipment", value)}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Additional equipment" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="standard">Standard Setup</SelectItem>
-                          <SelectItem value="video-conference">Video Conferencing</SelectItem>
-                          <SelectItem value="presentation">Presentation Setup</SelectItem>
-                          <SelectItem value="recording">Recording Equipment</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
+          {/* Search/Availability Form */}
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
-                    <Label htmlFor="requirements">Special Requirements</Label>
-                    <Textarea
-                      id="requirements"
-                      placeholder="Any specific setup requirements, catering needs, or special requests..."
-                      value={formData.requirements}
-                      onChange={(e) => handleInputChange("requirements", e.target.value)}
-                      rows={3}
-                    />
+                    <Label htmlFor="space-type">Space Type</Label>
+                    <Select onValueChange={(value) => handleInputChange("spaceType", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Space Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="meeting-room">Meeting Room</SelectItem>
+                        <SelectItem value="conference-room">Conference Room</SelectItem>
+                        <SelectItem value="boardroom">Boardroom</SelectItem>
+                        <SelectItem value="training-room">Training Room</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-
-                  <Button type="submit" className="w-full" size="lg">
-                    Book Meeting Room
+                  
+                  <div>
+                    <Label>Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                          aria-label="Select date"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedDate ? format(selectedDate, "PPP") : "Select Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="time-from">Time From</Label>
+                    <Select onValueChange={(value) => handleInputChange("timeFrom", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Start Time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="09:00">9:00 AM</SelectItem>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        <SelectItem value="13:00">1:00 PM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                        <SelectItem value="16:00">4:00 PM</SelectItem>
+                        <SelectItem value="17:00">5:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="time-until">Time Until</Label>
+                    <Select onValueChange={(value) => handleInputChange("timeUntil", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select End Time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        <SelectItem value="13:00">1:00 PM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                        <SelectItem value="16:00">4:00 PM</SelectItem>
+                        <SelectItem value="17:00">5:00 PM</SelectItem>
+                        <SelectItem value="18:00">6:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <Button type="submit" size="lg">
+                    Check Availability
                   </Button>
-                </form>
-              </CardContent>
-            </Card>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Workspace Listings */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {meetingRooms.map((room) => (
+              <Card key={room.id} className="overflow-hidden">
+                <div className="aspect-video relative overflow-hidden">
+                  <img 
+                    src={room.image} 
+                    alt={room.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold mb-2">{room.name}</h3>
+                  <p className="text-muted-foreground mb-4">{room.description}</p>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <Star className="h-5 w-5 text-yellow-500 fill-current mr-1" />
+                      <span className="font-medium">{room.rating}</span>
+                      <span className="text-muted-foreground ml-1">({room.reviews} reviews)</span>
+                    </div>
+                    <div className="text-primary font-bold text-lg">${room.price}/hour</div>
+                  </div>
+                  
+                  <Button variant="outline" className="w-full">View Details</Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+
+          {/* Current Selection Summary */}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold mb-4">Your Current Selection</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground">Space Type</Label>
+                  <p className="font-medium text-primary">
+                    {formData.spaceType || "Not selected"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Date</Label>
+                  <p className="font-medium text-primary">
+                    {selectedDate ? format(selectedDate, "PPP") : "Not selected"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Time From</Label>
+                  <p className="font-medium text-primary">
+                    {formData.timeFrom || "Not selected"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Time Until</Label>
+                  <p className="font-medium text-primary">
+                    {formData.timeUntil || "Not selected"}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground">
+                  Make your selections above to see available spaces
+                </p>
+                <Button>Continue Booking</Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 

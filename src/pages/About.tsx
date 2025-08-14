@@ -5,8 +5,12 @@ import { MapPin, Users, Building2, Award, Heart, Target, Lightbulb } from "lucid
 import { Link } from "react-router-dom";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const About = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   return (
     <div className="min-h-screen bg-background">
       <Header />

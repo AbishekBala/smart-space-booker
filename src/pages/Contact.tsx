@@ -5,6 +5,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { 
   MapPin, 
   Phone, 
@@ -15,6 +16,9 @@ import {
 } from "lucide-react";
 
 const Contact = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   return (
     <div className="min-h-screen bg-background">
       <Header />

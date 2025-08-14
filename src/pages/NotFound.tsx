@@ -4,8 +4,12 @@ import { Button } from "@/components/ui/button";
 import { Home, ArrowLeft } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const NotFound = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const location = useLocation();
 
   useEffect(() => {

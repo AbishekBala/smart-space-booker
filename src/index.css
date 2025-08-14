@@ -5,6 +5,24 @@
 /* SpaceBooking Design System - Professional workspace booking platform */
 
 @layer base {
+  html {
+    scroll-behavior: smooth;
+    /* Enhanced smooth scrolling for better cross-browser support */
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-top: 0;
+  }
+  
+  /* Ensure smooth scrolling works on all scrollable elements */
+  * {
+    scroll-behavior: smooth;
+  }
+  
+  /* Smooth scrolling for specific scroll containers */
+  .scroll-smooth {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
   :root {
     --background: 0 0% 100%;
     --foreground: 220 13% 18%;
@@ -97,6 +115,30 @@
     --sidebar-accent-foreground: 240 4.8% 95.9%;
     --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+@layer components {
+  /* Smooth scrolling utility classes */
+  .scroll-smooth-container {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .scroll-smooth-element {
+    scroll-behavior: smooth;
+  }
+  
+  /* Enhanced scroll animations */
+  .scroll-fade-in {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  
+  .scroll-fade-in.visible {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 

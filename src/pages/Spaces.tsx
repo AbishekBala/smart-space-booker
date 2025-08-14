@@ -8,6 +8,7 @@ import { Badge } from "@/components/ui/badge";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SpaceCard from "@/components/SpaceCard";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { 
   Filter, 
   Search, 
@@ -22,6 +23,9 @@ import meetingRoomImage from "@/assets/meeting-room.jpg";
 import { useNavigate } from "react-router-dom";
 
 const Spaces = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const navigate = useNavigate();
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [priceRange, setPriceRange] = useState([0, 200]);

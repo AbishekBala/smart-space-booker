@@ -3,277 +3,248 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { format } from "date-fns";
-import { Calendar as CalendarIcon, Building2, Users, Clock, MapPin } from "lucide-react";
+import { Calendar as CalendarIcon, Clock, Star, MapPin, Users, Building2, Zap } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useToast } from "@/hooks/use-toast";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
 const OfficeBooking = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    company: "",
-    officeType: "",
-    duration: "",
-    attendees: "",
-    timeSlot: "",
-    requirements: ""
+    spaceType: "",
+    date: "",
+    timeFrom: "",
+    timeUntil: ""
   });
   const { toast } = useToast();
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     toast({
-      title: "Booking Request Submitted",
-      description: "We'll contact you within 24 hours to confirm your office booking.",
+      title: "Availability Checked",
+      description: "Available office spaces have been updated based on your search criteria.",
     });
-    // Reset form
-    setFormData({
-      name: "",
-      email: "",
-      phone: "",
-      company: "",
-      officeType: "",
-      duration: "",
-      attendees: "",
-      timeSlot: "",
-      requirements: ""
-    });
-    setSelectedDate(undefined);
   };
 
   const handleInputChange = (field: string, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
   };
 
+  const officeSpaces = [
+    {
+      id: 1,
+      name: "Private Office",
+      image: "/src/assets/private-office.jpg",
+      description: "Secure, dedicated office space for teams of 1-10 people with 24/7 access and amenities.",
+      rating: 4.9,
+      reviews: 87,
+      price: 75,
+      type: "Private Office",
+      capacity: "1-10 people",
+      amenities: ["24/7 Access", "Dedicated Space", "Premium Amenities"]
+    },
+    {
+      id: 2,
+      name: "Executive Suite",
+      image: "/src/assets/private-office.jpg",
+      description: "Premium office space for 5-20 people with concierge services and premium business district location.",
+      rating: 4.8,
+      reviews: 156,
+      price: 150,
+      type: "Executive Suite",
+      capacity: "5-20 people",
+      amenities: ["Concierge Services", "Premium Location", "Executive Amenities"]
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-background">
       <Header />
       
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-4xl mx-auto">
+        <div className="max-w-6xl mx-auto">
+          {/* Header Section */}
           <div className="text-center mb-8">
             <h1 className="text-4xl font-bold text-foreground mb-4">
-              Book Your Perfect Office Space
+              Find Your Perfect Workspace
             </h1>
             <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Find the ideal private office for your team. From single offices to executive suites, 
-              we have the perfect workspace for your business needs.
+              Search available spaces and book your next productive environment with ease.
             </p>
           </div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
-            {/* Office Types */}
-            <div className="space-y-6">
-              <h2 className="text-2xl font-semibold text-foreground mb-4">Available Office Types</h2>
-              
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-primary" />
-                    Private Office
-                  </CardTitle>
-                  <CardDescription>Perfect for 1-4 people</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>1-4 people capacity</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>Prime business locations</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>24/7 access available</span>
-                    </div>
-                  </div>
-                  <p className="font-semibold text-primary mt-4">Starting from $500/month</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader>
-                  <CardTitle className="flex items-center gap-2">
-                    <Building2 className="h-5 w-5 text-primary" />
-                    Executive Suite
-                  </CardTitle>
-                  <CardDescription>Premium offices for 5-20 people</CardDescription>
-                </CardHeader>
-                <CardContent>
-                  <div className="space-y-2 text-sm text-muted-foreground">
-                    <div className="flex items-center gap-2">
-                      <Users className="h-4 w-4" />
-                      <span>5-20 people capacity</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <MapPin className="h-4 w-4" />
-                      <span>Premium business districts</span>
-                    </div>
-                    <div className="flex items-center gap-2">
-                      <Clock className="h-4 w-4" />
-                      <span>Concierge services included</span>
-                    </div>
-                  </div>
-                  <p className="font-semibold text-primary mt-4">Starting from $1,500/month</p>
-                </CardContent>
-              </Card>
-            </div>
-
-            {/* Booking Form */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Office Booking Request</CardTitle>
-                <CardDescription>
-                  Fill out the form below and we'll help you find the perfect office space.
-                </CardDescription>
-              </CardHeader>
-              <CardContent>
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="name">Full Name *</Label>
-                      <Input
-                        id="name"
-                        value={formData.name}
-                        onChange={(e) => handleInputChange("name", e.target.value)}
-                        required
-                        aria-describedby="name-description"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="email">Email *</Label>
-                      <Input
-                        id="email"
-                        type="email"
-                        value={formData.email}
-                        onChange={(e) => handleInputChange("email", e.target.value)}
-                        required
-                        aria-describedby="email-description"
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input
-                        id="phone"
-                        type="tel"
-                        value={formData.phone}
-                        onChange={(e) => handleInputChange("phone", e.target.value)}
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="company">Company Name</Label>
-                      <Input
-                        id="company"
-                        value={formData.company}
-                        onChange={(e) => handleInputChange("company", e.target.value)}
-                      />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="office-type">Office Type *</Label>
-                      <Select onValueChange={(value) => handleInputChange("officeType", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select office type" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="private-1-4">Private Office (1-4 people)</SelectItem>
-                          <SelectItem value="executive-5-20">Executive Suite (5-20 people)</SelectItem>
-                          <SelectItem value="custom">Custom Requirements</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="attendees">Team Size *</Label>
-                      <Select onValueChange={(value) => handleInputChange("attendees", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Number of people" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1">1 person</SelectItem>
-                          <SelectItem value="2-4">2-4 people</SelectItem>
-                          <SelectItem value="5-10">5-10 people</SelectItem>
-                          <SelectItem value="11-20">11-20 people</SelectItem>
-                          <SelectItem value="20+">20+ people</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label>Preferred Start Date *</Label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className="w-full justify-start text-left font-normal"
-                            aria-label="Select date"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={selectedDate}
-                            onSelect={setSelectedDate}
-                            disabled={(date) => date < new Date()}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <div>
-                      <Label htmlFor="duration">Duration *</Label>
-                      <Select onValueChange={(value) => handleInputChange("duration", value)} required>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Lease duration" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="1-month">1 Month</SelectItem>
-                          <SelectItem value="3-months">3 Months</SelectItem>
-                          <SelectItem value="6-months">6 Months</SelectItem>
-                          <SelectItem value="12-months">12 Months</SelectItem>
-                          <SelectItem value="24-months">24+ Months</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-
+          {/* Search/Availability Form */}
+          <Card className="mb-8">
+            <CardContent className="p-6">
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   <div>
-                    <Label htmlFor="requirements">Special Requirements</Label>
-                    <Textarea
-                      id="requirements"
-                      placeholder="Any specific requirements or preferences for your office space..."
-                      value={formData.requirements}
-                      onChange={(e) => handleInputChange("requirements", e.target.value)}
-                      rows={3}
-                    />
+                    <Label htmlFor="space-type">Space Type</Label>
+                    <Select onValueChange={(value) => handleInputChange("spaceType", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Space Type" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="private-office">Private Office</SelectItem>
+                        <SelectItem value="executive-suite">Executive Suite</SelectItem>
+                        <SelectItem value="dedicated-desk">Dedicated Desk</SelectItem>
+                        <SelectItem value="custom-office">Custom Office</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-
-                  <Button type="submit" className="w-full" size="lg">
-                    Submit Booking Request
+                  
+                  <div>
+                    <Label>Date</Label>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className="w-full justify-start text-left font-normal"
+                          aria-label="Select date"
+                        >
+                          <CalendarIcon className="mr-2 h-4 w-4" />
+                          {selectedDate ? format(selectedDate, "PPP") : "Select Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          disabled={(date) => date < new Date()}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="time-from">Time From</Label>
+                    <Select onValueChange={(value) => handleInputChange("timeFrom", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select Start Time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="09:00">9:00 AM</SelectItem>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        <SelectItem value="13:00">1:00 PM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                        <SelectItem value="16:00">4:00 PM</SelectItem>
+                        <SelectItem value="17:00">5:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="time-until">Time Until</Label>
+                    <Select onValueChange={(value) => handleInputChange("timeUntil", value)}>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select End Time" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10:00">10:00 AM</SelectItem>
+                        <SelectItem value="11:00">11:00 AM</SelectItem>
+                        <SelectItem value="12:00">12:00 PM</SelectItem>
+                        <SelectItem value="13:00">1:00 PM</SelectItem>
+                        <SelectItem value="14:00">2:00 PM</SelectItem>
+                        <SelectItem value="15:00">3:00 PM</SelectItem>
+                        <SelectItem value="16:00">4:00 PM</SelectItem>
+                        <SelectItem value="17:00">5:00 PM</SelectItem>
+                        <SelectItem value="18:00">6:00 PM</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+                
+                <div className="text-center">
+                  <Button type="submit" size="lg">
+                    Check Availability
                   </Button>
-                </form>
-              </CardContent>
-            </Card>
+                </div>
+              </form>
+            </CardContent>
+          </Card>
+
+          {/* Workspace Listings */}
+          <div className="grid md:grid-cols-2 gap-8 mb-8">
+            {officeSpaces.map((space) => (
+              <Card key={space.id} className="overflow-hidden">
+                <div className="aspect-video relative overflow-hidden">
+                  <img 
+                    src={space.image} 
+                    alt={space.name}
+                    className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  />
+                </div>
+                <CardContent className="p-6">
+                  <h3 className="text-xl font-bold mb-2">{space.name}</h3>
+                  <p className="text-muted-foreground mb-4">{space.description}</p>
+                  
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center">
+                      <Star className="h-5 w-5 text-yellow-500 fill-current mr-1" />
+                      <span className="font-medium">{space.rating}</span>
+                      <span className="text-muted-foreground ml-1">({space.reviews} reviews)</span>
+                    </div>
+                    <div className="text-primary font-bold text-lg">${space.price}/day</div>
+                  </div>
+                  
+                  <Button variant="outline" className="w-full">View Details</Button>
+                </CardContent>
+              </Card>
+            ))}
           </div>
+
+          {/* Current Selection Summary */}
+          <Card>
+            <CardContent className="p-6">
+              <h3 className="text-xl font-bold mb-4">Your Current Selection</h3>
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
+                <div>
+                  <Label className="text-sm text-muted-foreground">Space Type</Label>
+                  <p className="font-medium text-primary">
+                    {formData.spaceType || "Not selected"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Date</Label>
+                  <p className="font-medium text-primary">
+                    {selectedDate ? format(selectedDate, "PPP") : "Not selected"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Time From</Label>
+                  <p className="font-medium text-primary">
+                    {formData.timeFrom || "Not selected"}
+                  </p>
+                </div>
+                <div>
+                  <Label className="text-sm text-muted-foreground">Time Until</Label>
+                  <p className="font-medium text-primary">
+                    {formData.timeUntil || "Not selected"}
+                  </p>
+                </div>
+              </div>
+              
+              <div className="flex items-center justify-between">
+                <p className="text-muted-foreground">
+                  Make your selections above to see available spaces
+                </p>
+                <Button>Continue Booking</Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
       </main>
 

@@ -5,6 +5,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import SpaceCard from "@/components/SpaceCard";
+import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { 
   Building2, 
   Users, 
@@ -21,6 +22,9 @@ import privateOfficeImage from "@/assets/private-office.jpg";
 import meetingRoomImage from "@/assets/meeting-room.jpg";
 
 const Index = () => {
+  // Scroll to top when component mounts
+  useScrollToTop();
+  
   const featuredSpaces = [
     {
       id: "1",
