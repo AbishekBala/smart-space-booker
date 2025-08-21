@@ -26,6 +26,8 @@ const Login = () => {
   // Hardcoded credentials
   const VALID_USERNAME = "user";
   const VALID_PASSWORD = "1234";
+  const ADMIN_USERNAME = "admin";
+  const ADMIN_PASSWORD = "admin123";
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -41,6 +43,13 @@ const Login = () => {
       
       // Navigate to home page
       navigate("/");
+    } else if (username === ADMIN_USERNAME && password === ADMIN_PASSWORD) {
+      // Admin login
+      login(username);
+      localStorage.setItem("isAdmin", "true");
+      
+      // Navigate to admin dashboard
+      navigate("/admin");
     } else {
       setError("Invalid username or password. Please try again.");
     }
@@ -139,8 +148,8 @@ const Login = () => {
               <div className="mt-6 p-4 bg-muted rounded-lg">
                 <h4 className="text-sm font-medium text-muted-foreground mb-2">Demo Credentials:</h4>
                 <div className="text-sm space-y-1">
-                  <p><span className="font-medium">Username:</span> user</p>
-                  <p><span className="font-medium">Password:</span> 1234</p>
+                  <p><span className="font-medium">User:</span> user / 1234</p>
+                  <p><span className="font-medium">Admin:</span> admin / admin123</p>
                 </div>
               </div>
             </CardContent>

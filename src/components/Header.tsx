@@ -9,6 +9,7 @@ const Header = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { isLoggedIn, username, logout } = useAuth();
+  const isAdmin = localStorage.getItem("isAdmin") === "true";
 
   const handleLogout = () => {
     logout();
@@ -114,6 +115,13 @@ const Header = () => {
           {isLoggedIn ? (
             <div className="flex items-center space-x-3">
               <span className="text-sm text-muted-foreground">Welcome, {username}!</span>
+              {isAdmin && (
+                <Link to="/admin">
+                  <Button variant="outline" size="sm">
+                    Admin Dashboard
+                  </Button>
+                </Link>
+              )}
               <Button variant="outline" onClick={handleLogout}>
                 <LogOut className="h-4 w-4 mr-2" />
                 Sign Out

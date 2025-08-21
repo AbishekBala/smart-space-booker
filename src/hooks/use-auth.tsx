@@ -37,6 +37,7 @@ export const useAuth = () => {
   const logout = () => {
     localStorage.removeItem("isLoggedIn");
     localStorage.removeItem("username");
+    localStorage.removeItem("isAdmin");
     setAuthState({ isLoggedIn: false, username: "" });
   };
 
