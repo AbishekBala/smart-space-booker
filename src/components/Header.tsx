@@ -20,21 +20,19 @@ const Header = () => {
 
   const navigationLinks = [
     { href: "/", label: "Home", ariaLabel: "Home page" },
-    { href: "/office-booking", label: "Office Space", ariaLabel: "Book office spaces" },
-    { href: "/meeting-rooms", label: "Meeting Rooms", ariaLabel: "Book meeting rooms" },
-    { href: "/coworking", label: "Coworking", ariaLabel: "Book coworking spaces" },
+    { href: "/book", label: "WorkSpaces", ariaLabel: "View and book workspaces" },
     { href: "/about", label: "About Us", ariaLabel: "About us" },
-    { href: "/contact", label: "Contact Us", ariaLabel: "Contact us" },
+    { href: "/contact", label: "Contact", ariaLabel: "Contact us" },
   ];
 
   return (
     <header className="border-b bg-background sticky top-0 z-50">
       <div className="container mx-auto px-4 py-4 flex items-center justify-between">
         <Link to="/" className="flex items-center space-x-2">
-          <div className="w-8 h-8 bg-primary rounded-md flex items-center justify-center">
-            <span className="text-primary-foreground font-bold text-lg">S</span>
+          <div className="w-8 h-8 bg-blue-500 rounded-md flex items-center justify-center">
+            <span className="text-white font-bold text-lg">S</span>
           </div>
-          <span className="text-xl font-bold text-foreground">Gigspace</span>
+          <span className="text-xl font-bold">Gigspace</span>
         </Link>
 
         {/* Desktop Navigation */}
@@ -129,9 +127,8 @@ const Header = () => {
             </div>
           ) : (
             <Link to="/login">
-              <Button>
-                <LogIn className="h-4 w-4 mr-2" />
-                Sign In
+              <Button className="bg-blue-500 hover:bg-blue-600">
+                Sign up
               </Button>
             </Link>
           )}

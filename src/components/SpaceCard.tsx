@@ -17,10 +17,7 @@ interface SpaceCardProps {
   type: string;
   image: string;
   location: string;
-  capacity: number;
   price: number;
-  rating: number;
-  reviews: number;
   amenities: string[];
   description: string;
   onClick?: () => void;
@@ -39,74 +36,40 @@ const SpaceCard = ({
   type,
   image,
   location,
-  capacity,
   price,
-  rating,
-  reviews,
   amenities,
   description,
   onClick
 }: SpaceCardProps) => {
   return (
-    <Card className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={onClick}>
+    <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="aspect-video relative overflow-hidden">
         <img 
           src={image} 
           alt={name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="w-full h-full object-cover"
         />
-        <Badge className="absolute top-3 left-3 bg-primary">
-          {type}
-        </Badge>
       </div>
       
       <CardContent className="p-6">
-        <div className="mb-2">
-          <h3 className="font-semibold text-lg">{name}</h3>
-        </div>
-        
-        <div className="flex items-center space-x-4 text-sm text-muted-foreground mb-3">
-          <div className="flex items-center">
-            <MapPin className="h-4 w-4 mr-1" />
-            {location}
-          </div>
-          <div className="flex items-center">
-            <Users className="h-4 w-4 mr-1" />
-            {capacity} people
+        <div className="flex justify-between items-start mb-2">
+          <div>
+            <h3 className="text-xl font-semibold mb-1">{name}</h3>
+            <p className="text-sm text-gray-600">${price}/hr</p>
           </div>
         </div>
-        
-        <div className="flex items-center mb-3">
-          <div className="flex">
-            {[...Array(5)].map((_, i) => (
-              <Star 
-                key={i} 
-                className={`h-4 w-4 ${i < Math.floor(rating) ? 'text-warning fill-current' : 'text-muted-foreground'}`} 
-              />
-            ))}
-          </div>
-          <span className="ml-2 text-sm font-medium">{rating}</span>
-          <span className="ml-1 text-sm text-muted-foreground">({reviews} reviews)</span>
-        </div>
-        
-        <p className="text-muted-foreground text-sm mb-4 line-clamp-2">{description}</p>
+
+        <p className="text-sm text-gray-600 mb-4 line-clamp-2">{description}</p>
         
         <div className="flex flex-wrap gap-2 mb-4">
-          {amenities.slice(0, 3).map((amenity) => {
-            const Icon = amenityIcons[amenity] || Clock;
-            return (
-              <div key={amenity} className="flex items-center text-xs text-muted-foreground">
-                <Icon className="h-3 w-3 mr-1" />
-                {amenity}
-              </div>
-            );
-          })}
-          {amenities.length > 3 && (
-            <span className="text-xs text-muted-foreground">+{amenities.length - 3} more</span>
-          )}
+          {amenities.map((amenity) => (
+            <Badge key={amenity} variant="secondary" className="flex items-center gap-1">
+              <Clock className="w-3 h-3" /> {amenity}
+            </Badge>
+          ))}
         </div>
         
-        <Button className="w-full">Book Now</Button>
+        <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">Book Now</Button>
       </CardContent>
     </Card>
   );

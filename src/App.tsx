@@ -15,6 +15,7 @@ import SpaceDetails from "./pages/SpaceDetails";
 import Login from "./pages/Login";
 import AdminDashboard from "./pages/AdminDashboard";
 import NotFound from "./pages/NotFound";
+import BookSpace from "./pages/BookSpace";
 
 const queryClient = new QueryClient();
 
@@ -35,6 +36,7 @@ const AppContent = () => {
         <Route path="/contact" element={<Contact />} />
         <Route path="/spaces" element={<Spaces />} />
         <Route path="/spaces/:id" element={<SpaceDetails />} />
+        <Route path="/book" element={<BookSpace />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

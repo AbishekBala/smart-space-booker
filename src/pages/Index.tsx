@@ -16,6 +16,7 @@ import {
   Clock,
   Star
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import heroImage from "@/assets/hero-workspace.jpg";
 import coworkingImage from "@/assets/coworking-space.jpg";
 import privateOfficeImage from "@/assets/private-office.jpg";
@@ -24,46 +25,68 @@ import meetingRoomImage from "@/assets/meeting-room.jpg";
 const Index = () => {
   // Scroll to top when component mounts
   useScrollToTop();
+  const navigate = useNavigate();
   
   const featuredSpaces = [
     {
       id: "1",
-      name: "Office Space",
+      name: "Executive Office Suite",
       type: "Private Office",
       image: privateOfficeImage,
       location: "Downtown",
-      capacity: 20,
-      price: 0,
-      rating: 4.8,
-      reviews: 124,
-      amenities: ["High-speed WiFi", "Coffee & Refreshments", "Printer Access"],
-      description: "Premium private office spaces perfect for teams and businesses."
+      price: 75,
+      amenities: ["WiFi", "All Day Access", "Printer Access"],
+      description: "Executive suite with modern amenities perfect for professional and private local business."
     },
     {
       id: "2",
-      name: "Meeting Rooms",
+      name: "Conference Room",
       type: "Meeting Room",
       image: meetingRoomImage,
-      location: "Tech District",
-      capacity: 15,
-      price: 0,
-      rating: 4.9,
-      reviews: 87,
-      amenities: ["High-speed WiFi", "Coffee & Refreshments", "Printer Access"],
-      description: "Professional meeting spaces for presentations and collaborations."
+      location: "Downtown",
+      price: 120,
+      amenities: ["WiFi", "Video Conferencing", "Whiteboard"],
+      description: "Professional space perfect for conferences and executive meetings."
     },
     {
       id: "3",
-      name: "Coworking",
+      name: "Coworking Hotdesk",
       type: "Coworking",
       image: coworkingImage,
-      location: "Creative Quarter",
-      capacity: 50,
-      price: 0,
-      rating: 4.7,
-      reviews: 52,
-      amenities: ["High-speed WiFi", "Coffee & Refreshments", "Printer Access"],
-      description: "Flexible coworking spaces perfect for individuals and teams."
+      location: "Tech Hub",
+      price: 25,
+      amenities: ["WiFi", "Coffee Bar", "Phone Booths"],
+      description: "Flexible workspace perfect for individuals and small teams."
+    },
+    {
+      id: "4",
+      name: "Creative Studio",
+      type: "Studio",
+      image: privateOfficeImage,
+      location: "Arts District",
+      price: 95,
+      amenities: ["24 Hours", "Studio Lighting", "Sound System"],
+      description: "Inspiring space designed for creative teams, photographers, filming events, and team building."
+    },
+    {
+      id: "5",
+      name: "Private Office",
+      type: "Office",
+      image: privateOfficeImage,
+      location: "Business District",
+      price: 55,
+      amenities: ["12 People", "Private Access", "Phone System"],
+      description: "Single dedicated office space for focused work and private meetings for growing teams."
+    },
+    {
+      id: "6",
+      name: "Casual Meeting Pod",
+      type: "Meeting Pod",
+      image: meetingRoomImage,
+      location: "Innovation Hub",
+      price: 45,
+      amenities: ["24 Hours", "Lounge Setup", "Smart TV"],
+      description: "Comfortable, informal meeting space ideal for brainstorming and team meetings."
     }
   ];
 
@@ -72,143 +95,150 @@ const Index = () => {
       <Header />
       {/* Hero Section - Reference Style */}
       <section
-        className="relative flex flex-col items-center justify-center min-h-[70vh] w-full"
+        className="relative flex flex-col items-center h-[75vh] w-full"
         style={{
           backgroundImage: `url(${heroImage})`,
           backgroundSize: 'cover',
-          backgroundPosition: 'center',
+          backgroundPosition: 'center 65%'
         }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-blue-900/70 via-blue-800/60 to-indigo-900/70 z-0" />
-        <div className="relative z-10 flex flex-col items-center justify-center w-full px-4 py-20">
-          <h1 className="text-white text-5xl font-bold mb-4 text-center">Your Space, Your Time</h1>
-          <p className="text-white text-lg mb-10 text-center max-w-2xl">
-            GigSpace offers premium office spaces, coworking desks, and meeting rooms — flexible, affordable, and tailored to your needs.
-          </p>
-          <div className="flex flex-col md:flex-row gap-6 justify-center w-full max-w-4xl">
-            {/* Office Space Card */}
-            <div className="bg-white rounded-xl shadow-lg flex flex-col items-center p-8 w-full md:w-1/3">
-              <div className="bg-blue-100 rounded-full p-4 mb-4">
-                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M16 3v4M8 3v4"/></svg>
-              </div>
-              <h2 className="font-semibold text-xl mb-2">Office Space</h2>
-              <button className="bg-blue-500 text-white rounded-md px-6 py-2 mt-4 hover:bg-blue-600">Explore</button>
+        <div className="absolute inset-0 bg-black bg-opacity-50 z-0" />
+        <div className="relative z-10 flex flex-col items-center w-full px-4 mt-[25vh]">
+          <div className="text-center text-white mb-8 max-w-4xl mx-auto">
+            <h1 className="text-4xl md:text-5xl font-bold mb-4">
+              Your Perfect Workspace Awaits
+            </h1>
+            <p className="text-xl md:text-2xl opacity-90 max-w-2xl mx-auto">
+              From private offices to dynamic coworking spaces, find the perfect environment for your success.
+            </p>
+          </div>
+
+          {/* Search Box */}
+          <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+            <h2 className="text-lg font-medium mb-4">Browse available assets</h2>
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Asset Type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="office">Office Space</SelectItem>
+                  <SelectItem value="meeting">Meeting Room</SelectItem>
+                  <SelectItem value="coworking">Coworking Space</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Input type="date" className="w-full" />
+
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Capacity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1-4">1-4 People</SelectItem>
+                  <SelectItem value="5-10">5-10 People</SelectItem>
+                  <SelectItem value="10+">10+ People</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Amenities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wifi">WiFi</SelectItem>
+                  <SelectItem value="projector">Projector</SelectItem>
+                  <SelectItem value="whiteboard">Whiteboard</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-            {/* Coworking Card */}
-            <div className="bg-white rounded-xl shadow-lg flex flex-col items-center p-8 w-full md:w-1/3">
-              <div className="bg-blue-100 rounded-full p-4 mb-4">
-                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M6 20v-2a4 4 0 0 1 4-4h4a4 4 0 0 1 4 4v2"/></svg>
-              </div>
-              <h2 className="font-semibold text-xl mb-2">Coworking</h2>
-              <button className="bg-blue-500 text-white rounded-md px-6 py-2 mt-4 hover:bg-blue-600">Explore</button>
-            </div>
-            {/* Meeting Rooms Card */}
-            <div className="bg-white rounded-xl shadow-lg flex flex-col items-center p-8 w-full md:w-1/3">
-              <div className="bg-blue-100 rounded-full p-4 mb-4">
-                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="13" rx="2"/><path d="M8 3v4M16 3v4"/></svg>
-              </div>
-              <h2 className="font-semibold text-xl mb-2">Meeting Rooms</h2>
-              <button className="bg-blue-500 text-white rounded-md px-6 py-2 mt-4 hover:bg-blue-600">Explore</button>
+            <div className="flex justify-end mt-4">
+              <Button 
+                onClick={() => navigate("/book")}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8"
+              >
+                Explore
+              </Button>
             </div>
           </div>
         </div>
       </section>
 
       {/* How It Works */}
-      <section className="py-20 bg-gradient-to-br from-slate-50 to-blue-50/30 relative overflow-hidden">
-        {/* Background decorative elements */}
-        <div className="absolute top-0 left-0 w-72 h-72 bg-blue-100/40 rounded-full -translate-x-1/2 -translate-y-1/2" />
-        <div className="absolute bottom-0 right-0 w-96 h-96 bg-indigo-100/30 rounded-full translate-x-1/3 translate-y-1/3" />
-        
-        <div className="container mx-auto px-4 relative z-10">
-          <div className="text-center mb-16">
-            <div className="inline-flex items-center gap-2 bg-blue-100 text-blue-700 px-4 py-2 rounded-full text-sm font-medium mb-4">
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-              </svg>
-              How It Works
-            </div>
-            <h2 className="text-4xl lg:text-5xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">
-              Simple steps to book your perfect workspace
-            </h2>
-            <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-              Get started with our streamlined booking process in just three easy steps
+      <section className="py-16 bg-white">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Book your perfect event in four simple steps. Our streamlined process makes event
+              planning effortless and enjoyable.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
             {/* Step 1 */}
-            <div className="relative group">
-              <div className="text-center space-y-6 p-8 rounded-2xl bg-white/70 backdrop-blur-sm border border-blue-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-blue-500 to-blue-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-blue-200 transition-shadow duration-300">
-                    <span className="text-3xl font-bold text-white">1</span>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-blue-200 rounded-full animate-pulse" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Choose Your Space</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Browse through our curated selection of premium office spaces, collaborative coworking desks, and state-of-the-art meeting rooms.
-                </p>
-                <div className="flex justify-center">
-                  <div className="w-12 h-1 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full" />
-                </div>
+            <div className="text-center">
+              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
               </div>
-              {/* Connection line */}
-              <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-blue-300 to-blue-200 transform -translate-y-1/2" />
+              <h3 className="font-semibold mb-2">Choose Available Assets</h3>
+              <p className="text-sm text-gray-500">
+                Select from our wide range of premium workspaces
+              </p>
             </div>
-            
+
             {/* Step 2 */}
-            <div className="relative group">
-              <div className="text-center space-y-6 p-8 rounded-2xl bg-white/70 backdrop-blur-sm border border-blue-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-indigo-500 to-indigo-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-indigo-200 transition-shadow duration-300">
-                    <span className="text-3xl font-bold text-white">2</span>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-indigo-200 rounded-full animate-pulse" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Check Availability</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  View real-time availability and select the perfect time slot that aligns with your schedule and requirements.
-                </p>
-                <div className="flex justify-center">
-                  <div className="w-12 h-1 bg-gradient-to-r from-indigo-500 to-purple-500 rounded-full" />
-                </div>
+            <div className="text-center">
+              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
               </div>
-              {/* Connection line */}
-              <div className="hidden md:block absolute top-1/2 -right-6 w-12 h-0.5 bg-gradient-to-r from-indigo-300 to-indigo-200 transform -translate-y-1/2" />
+              <h3 className="font-semibold mb-2">Browse Assets</h3>
+              <p className="text-sm text-gray-500">
+                Explore verified spaces and available options
+              </p>
             </div>
-            
+
             {/* Step 3 */}
-            <div className="relative group">
-              <div className="text-center space-y-6 p-8 rounded-2xl bg-white/70 backdrop-blur-sm border border-blue-100/50 shadow-lg hover:shadow-xl transition-all duration-300 transform hover:-translate-y-2">
-                <div className="relative">
-                  <div className="w-20 h-20 bg-gradient-to-br from-green-500 to-green-600 rounded-2xl flex items-center justify-center mx-auto shadow-lg group-hover:shadow-green-200 transition-shadow duration-300">
-                    <span className="text-3xl font-bold text-white">3</span>
-                  </div>
-                  <div className="absolute -top-2 -right-2 w-6 h-6 bg-green-200 rounded-full animate-pulse" />
-                </div>
-                <h3 className="text-2xl font-bold text-gray-900">Book & Confirm</h3>
-                <p className="text-gray-600 leading-relaxed">
-                  Complete your booking with our secure, streamlined form and receive instant confirmation with all the details.
-                </p>
-                <div className="flex justify-center">
-                  <div className="w-12 h-1 bg-gradient-to-r from-green-500 to-emerald-500 rounded-full" />
-                </div>
+            <div className="text-center">
+              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
               </div>
+              <h3 className="font-semibold mb-2">Confirm Booking</h3>
+              <p className="text-sm text-gray-500">
+                Secure your booking with our guided confirmation
+              </p>
+            </div>
+
+            {/* Step 4 */}
+            <div className="text-center">
+              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
+                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h3 className="font-semibold mb-2">Enjoy Your Space</h3>
+              <p className="text-sm text-gray-500">
+                Relax and enjoy your perfectly planned space
+              </p>
             </div>
           </div>
         </div>
       </section>
 
       {/* Featured Spaces */}
-      <section className="py-20">
+      <section className="py-16 bg-gray-50">
         <div className="container mx-auto px-4">
-          <div className="flex justify-between items-center mb-12">
-            <div>
-              <h2 className="text-3xl lg:text-4xl font-bold mb-4">Featured Spaces</h2>
-              <p className="text-xl text-muted-foreground">Discover our most popular workspaces</p>
-            </div>
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Featured WorkSpaces</h2>
+            <p className="text-gray-600">
+              Discover our handpicked selection of top-rated spaces that guarantee exceptional experiences
+            </p>
           </div>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -216,78 +246,34 @@ const Index = () => {
               <SpaceCard key={space.id} {...space} />
             ))}
           </div>
-          
         </div>
       </section>
 
-      {/* Statistics */}
-      <section className="py-20 bg-primary text-primary-foreground">
+      {/* Newsletter Section */}
+      <section className="py-16 bg-blue-50">
         <div className="container mx-auto px-4">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8 text-center">
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">500+</div>
-              <div className="text-primary-foreground/80">Spaces Available</div>
+          <div className="max-w-2xl mx-auto text-center">
+            <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
+            <p className="text-gray-600 mb-6">
+              Subscribe for the latest event deals, venue updates, and exclusive offers.
+              Never miss out on the perfect event opportunity.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
+              <Input
+                type="email"
+                placeholder="Enter your email address"
+                className="flex-grow"
+              />
+              <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+                Subscribe
+              </Button>
             </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">10k+</div>
-              <div className="text-primary-foreground/80">Happy Customers</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">50+</div>
-              <div className="text-primary-foreground/80">Locations</div>
-            </div>
-            <div className="space-y-2">
-              <div className="text-4xl font-bold">4.9</div>
-              <div className="text-primary-foreground/80">Average Rating</div>
-            </div>
+            <p className="text-xs text-gray-500 mt-4">
+              We respect your privacy. Unsubscribe at any time.
+            </p>
           </div>
         </div>
       </section>
-
-      {/* Why Choose Us */}
-      <section className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl lg:text-4xl font-bold mb-4">Why Choose Gigspace</h2>
-            <p className="text-xl text-muted-foreground">Experience the future of flexible workspace booking</p>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
-            <Card className="text-center p-6">
-              <Building2 className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Prime Locations</h3>
-              <p className="text-muted-foreground text-sm">
-                Strategic locations in business districts and transportation hubs.
-              </p>
-            </Card>
-            
-            <Card className="text-center p-6">
-              <CheckCircle className="h-12 w-12 text-success mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Instant Booking</h3>
-              <p className="text-muted-foreground text-sm">
-                Book by the hour, day or month with easy and flexible scheduling options.
-              </p>
-            </Card>
-            
-            <Card className="text-center p-6">
-              <Users className="h-12 w-12 text-primary mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">24/7 Support</h3>
-              <p className="text-muted-foreground text-sm">
-                Dedicated customer service team available around the clock with any needs.
-              </p>
-            </Card>
-            
-            <Card className="text-center p-6">
-              <Star className="h-12 w-12 text-warning mx-auto mb-4" />
-              <h3 className="font-semibold mb-2">Premium Amenities</h3>
-              <p className="text-muted-foreground text-sm">
-                High-speed WiFi, printing services, conference facilities for productive work.
-              </p>
-            </Card>
-          </div>
-        </div>
-      </section>
-
 
       <Footer />
     </div>
