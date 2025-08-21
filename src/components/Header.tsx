@@ -1,12 +1,19 @@
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Phone, Menu } from "lucide-react";
+import { Phone, Menu, LogIn, LogOut } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { useState } from "react";
+import { useAuth } from "@/hooks/use-auth";
 
 const Header = () => {
   const location = useLocation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { isLoggedIn, username, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    setMobileMenuOpen(false);
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -73,9 +80,26 @@ const Header = () => {
                     <Phone className="h-4 w-4" />
                     <span>(555) 123-4567</span>
                   </div>
-                  <Button className="w-full" onClick={() => setMobileMenuOpen(false)}>
-                    Book Now
-                  </Button>
+                  {isLoggedIn ? (
+                    <div className="space-y-2">
+                      <p className="text-sm text-muted-foreground">Welcome, {username}!</p>
+                      <Button 
+                        variant="outline" 
+                        className="w-full" 
+                        onClick={handleLogout}
+                      >
+                        <LogOut className="h-4 w-4 mr-2" />
+                        Sign Out
+                      </Button>
+                    </div>
+                  ) : (
+                    <Link to="/login" onClick={() => setMobileMenuOpen(false)}>
+                      <Button className="w-full">
+                        <LogIn className="h-4 w-4 mr-2" />
+                        Sign In
+                      </Button>
+                    </Link>
+                  )}
                 </div>
               </nav>
             </SheetContent>
@@ -87,7 +111,22 @@ const Header = () => {
             <Phone className="h-4 w-4" />
             <span>(555) 123-4567</span>
           </div>
-          <Button>Book Now</Button>
+          {isLoggedIn ? (
+            <div className="flex items-center space-x-3">
+              <span className="text-sm text-muted-foreground">Welcome, {username}!</span>
+              <Button variant="outline" onClick={handleLogout}>
+                <LogOut className="h-4 w-4 mr-2" />
+                Sign Out
+              </Button>
+            </div>
+          ) : (
+            <Link to="/login">
+              <Button>
+                <LogIn className="h-4 w-4 mr-2" />
+                Sign In
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     </header>
