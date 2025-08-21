@@ -12,6 +12,7 @@ import About from "./pages/About";
 import Contact from "./pages/Contact";
 import Spaces from "./pages/Spaces";
 import SpaceDetails from "./pages/SpaceDetails";
+import Login from "./pages/Login";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -24,6 +25,7 @@ const App = () => (
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Index />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/office-booking" element={<OfficeBooking />} />
           <Route path="/meeting-rooms" element={<MeetingRooms />} />
           <Route path="/coworking" element={<Coworking />} />
