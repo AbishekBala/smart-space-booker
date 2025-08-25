@@ -10,6 +10,7 @@ import {
   Star,
   Clock
 } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 interface SpaceCardProps {
   id: string;
@@ -32,6 +33,7 @@ const amenityIcons: Record<string, any> = {
 };
 
 const SpaceCard = ({
+  id,
   name,
   type,
   image,
@@ -41,6 +43,16 @@ const SpaceCard = ({
   description,
   onClick
 }: SpaceCardProps) => {
+  const navigate = useNavigate();
+
+  const handleBookNow = () => {
+    if (onClick) {
+      onClick();
+    } else {
+      navigate(`/spaces/${id}`);
+    }
+  };
+
   return (
     <Card className="overflow-hidden hover:shadow-lg transition-shadow">
       <div className="aspect-video relative overflow-hidden">
@@ -69,7 +81,12 @@ const SpaceCard = ({
           ))}
         </div>
         
-        <Button className="w-full bg-blue-500 hover:bg-blue-600 text-white">Book Now</Button>
+        <Button 
+          onClick={handleBookNow}
+          className="w-full bg-blue-500 hover:bg-blue-600 text-white"
+        >
+          Book Now
+        </Button>
       </CardContent>
     </Card>
   );
