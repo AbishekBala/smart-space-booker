@@ -164,20 +164,35 @@ const MeetingRooms = () => {
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left Column: Room Images and Details */}
+            {/* Left Column: Room Images and Calendar */}
             <div className="lg:w-2/3 space-y-6">
-              {/* Main Image */}
-              <div className="rounded-xl overflow-hidden bg-gray-100 w-1/2">
-                <img
-                  src={mainImage}
-                  alt={selectedRoom.name}
-                  className="w-full h-[300px] object-cover"
-                  loading="eager"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder.svg";
-                  }}
-                />
+              <div className="flex flex-col md:flex-row gap-6">
+                {/* Main Image */}
+                <div className="md:w-1/2">
+                  <div className="rounded-xl overflow-hidden bg-gray-100">
+                    <img
+                      src={mainImage}
+                      alt={selectedRoom.name}
+                      className="w-full h-[300px] object-cover"
+                      loading="eager"
+                      onError={(e) => {
+                        const target = e.target as HTMLImageElement;
+                        target.src = "/placeholder.svg";
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Calendar */}
+                <div className="md:w-1/2">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={handleDateSelect}
+                    className="rounded-md border p-4 w-full"
+                    disabled={(date) => date < new Date()}
+                  />
+                </div>
               </div>
               
               {/* Thumbnail Gallery */}
@@ -235,32 +250,25 @@ const MeetingRooms = () => {
                       </div>
                     </div>
 
-                    {/* Calendar */}
-                    <div className="mb-6">
-                      <Calendar
-                        mode="single"
-                        selected={selectedDate}
-                        onSelect={handleDateSelect}
-                        className="rounded-md border p-4"
-                        disabled={(date) => date < new Date()}
-                      />
-                    </div>
-
                     {/* Time Slots */}
                     <div className="mb-6">
                       <h3 className="font-medium mb-3">Select Time</h3>
-                      <div className="grid grid-cols-1 gap-2">
+                      <div className="grid grid-cols-3 gap-2">
                         {timeSlots.map((timeSlot, idx) => {
                           const isSelected = isSlotSelected(timeSlot, selectedRoom.id);
                           return (
                             <Button
                               key={idx}
                               variant={isSelected ? "default" : "outline"}
-                              className="h-12 justify-between text-base"
+                              className="h-14 flex flex-col items-center justify-center p-2"
                               onClick={() => handleSlotClick(timeSlot, selectedRoom.id)}
                             >
-                              <span>{format(timeSlot.startTime, 'h a')} - {format(timeSlot.endTime, 'h a')}</span>
-                              <span>${selectedRoom.price}/hr</span>
+                              <span className="text-sm font-medium">
+                                {format(timeSlot.startTime, 'h a')}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {format(timeSlot.endTime, 'h a')}
+                              </span>
                             </Button>
                           );
                         })}
