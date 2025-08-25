@@ -117,46 +117,29 @@ const Index = () => {
           {/* Search Box */}
           <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-lg font-medium mb-4">Browse available assets</h2>
-            <div className="flex flex-col md:flex-row gap-4">
-              <Select>
-                <SelectTrigger className="flex-1">
-                  <SelectValue placeholder="Asset Type" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="office">Office Space</SelectItem>
-                  <SelectItem value="meeting">Meeting Room</SelectItem>
-                  <SelectItem value="coworking">Coworking Space</SelectItem>
-                </SelectContent>
-              </Select>
+            <div className="flex flex-col md:flex-row gap-4 items-end justify-center">
+              <div className="w-full md:w-64">
+                <Select>
+                  <SelectTrigger className="w-full">
+                    <SelectValue placeholder="Asset Type" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="private-office">Private Office</SelectItem>
+                    <SelectItem value="meeting-room">Meeting Room</SelectItem>
+                    <SelectItem value="coworking">Coworking Space</SelectItem>
+                    <SelectItem value="conference-room">Conference Room</SelectItem>
+                    <SelectItem value="creative-studio">Creative Studio</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
 
-              <Input type="date" className="w-full" />
+              <div className="w-full md:w-48">
+                <Input type="date" className="w-full" />
+              </div>
 
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Capacity" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1-4">1-4 People</SelectItem>
-                  <SelectItem value="5-10">5-10 People</SelectItem>
-                  <SelectItem value="10+">10+ People</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Amenities" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="wifi">WiFi</SelectItem>
-                  <SelectItem value="projector">Projectors</SelectItem>
-                  <SelectItem value="whiteboard">Whiteboard</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="flex justify-end mt-4">
               <Button 
                 onClick={() => navigate("/spaces")}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 h-10"
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 h-10 whitespace-nowrap"
               >
                 Explore
               </Button>
