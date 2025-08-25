@@ -129,8 +129,31 @@ const Index = () => {
                 </SelectContent>
               </Select>
 
-              <Input type="date" className="w-48" />
+              <Input type="date" className="w-full" />
 
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Capacity" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1-4">1-4 People</SelectItem>
+                  <SelectItem value="5-10">5-10 People</SelectItem>
+                  <SelectItem value="10+">10+ People</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <Select>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Amenities" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="wifi">WiFi</SelectItem>
+                  <SelectItem value="projector">Projector</SelectItem>
+                  <SelectItem value="whiteboard">Whiteboard</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="flex justify-end mt-4">
               <Button 
                 onClick={() => navigate("/spaces")}
                 className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 h-10"
