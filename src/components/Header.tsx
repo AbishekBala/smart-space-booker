@@ -20,7 +20,7 @@ const Header = () => {
 
   const navigationLinks = [
     { href: "/", label: "Home", ariaLabel: "Home page" },
-    { href: "/book", label: "WorkSpaces", ariaLabel: "View and book workspaces" },
+    { href: "/spaces", label: "WorkSpaces", ariaLabel: "View and book workspaces" },
     { href: "/about", label: "About Us", ariaLabel: "About us" },
     { href: "/contact", label: "Contact", ariaLabel: "Contact us" },
   ];

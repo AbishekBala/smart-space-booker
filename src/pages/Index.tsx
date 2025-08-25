@@ -17,6 +17,8 @@ import {
   Star
 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import { useState } from "react";
+import { useToast } from "@/hooks/use-toast";
 import heroImage from "@/assets/hero-workspace.jpg";
 import coworkingImage from "@/assets/coworking-space.jpg";
 import privateOfficeImage from "@/assets/private-office.jpg";
@@ -26,6 +28,35 @@ const Index = () => {
   // Scroll to top when component mounts
   useScrollToTop();
   const navigate = useNavigate();
+  const { toast } = useToast();
+  const [email, setEmail] = useState("");
+
+  const handleSubscribe = () => {
+    if (!email) {
+      toast({
+        title: "Error",
+        description: "Please enter your email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    if (!/\S+@\S+\.\S+/.test(email)) {
+      toast({
+        title: "Error", 
+        description: "Please enter a valid email address",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    // Here you would typically send the email to your backend
+    toast({
+      title: "Success!",
+      description: "Thank you for subscribing to our newsletter!",
+    });
+    setEmail("");
+  };
   
   const featuredSpaces = [
     {
@@ -50,43 +81,13 @@ const Index = () => {
     },
     {
       id: "3",
-      name: "Coworking Hotdesk",
+      name: "Coworking Space",
       type: "Coworking",
       image: coworkingImage,
       location: "Tech Hub",
       price: 25,
       amenities: ["WiFi", "Coffee Bar", "Phone Booths"],
       description: "Flexible workspace perfect for individuals and small teams."
-    },
-    {
-      id: "4",
-      name: "Creative Studio",
-      type: "Studio",
-      image: privateOfficeImage,
-      location: "Arts District",
-      price: 95,
-      amenities: ["24 Hours", "Studio Lighting", "Sound System"],
-      description: "Inspiring space designed for creative teams, photographers, filming events, and team building."
-    },
-    {
-      id: "5",
-      name: "Private Office",
-      type: "Office",
-      image: privateOfficeImage,
-      location: "Business District",
-      price: 55,
-      amenities: ["12 People", "Private Access", "Phone System"],
-      description: "Single dedicated office space for focused work and private meetings for growing teams."
-    },
-    {
-      id: "6",
-      name: "Casual Meeting Pod",
-      type: "Meeting Pod",
-      image: meetingRoomImage,
-      location: "Innovation Hub",
-      price: 45,
-      amenities: ["24 Hours", "Lounge Setup", "Smart TV"],
-      description: "Comfortable, informal meeting space ideal for brainstorming and team meetings."
     }
   ];
 
@@ -114,11 +115,11 @@ const Index = () => {
           </div>
 
           {/* Search Box */}
-          <div className="w-full max-w-4xl bg-white rounded-lg shadow-lg p-6">
+          <div className="w-full max-w-3xl bg-white rounded-lg shadow-lg p-6">
             <h2 className="text-lg font-medium mb-4">Browse available assets</h2>
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="flex flex-col md:flex-row gap-4">
               <Select>
-                <SelectTrigger className="w-full">
+                <SelectTrigger className="flex-1">
                   <SelectValue placeholder="Asset Type" />
                 </SelectTrigger>
                 <SelectContent>
@@ -147,15 +148,15 @@ const Index = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="wifi">WiFi</SelectItem>
-                  <SelectItem value="projector">Projector</SelectItem>
-                  
+                  <SelectItem value="projector">Projectors</SelectItem>
+                  <SelectItem value="whiteboard">Whiteboard</SelectItem>
                 </SelectContent>
               </Select>
             </div>
             <div className="flex justify-end mt-4">
               <Button 
-                onClick={() => navigate("/book")}
-                className="bg-blue-500 hover:bg-blue-600 text-white px-8"
+                onClick={() => navigate("/spaces")}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-2 h-10"
               >
                 Explore
               </Button>
@@ -165,67 +166,88 @@ const Index = () => {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 bg-white">
+      <section className="py-24 bg-white">
         <div className="container mx-auto px-4">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold mb-4">How It Works</h2>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Book your perfect event in four simple steps. Our streamlined process makes event
-              planning effortless and enjoyable.
+          <div className="text-center mb-20">
+            <h2 className="text-4xl font-bold text-gray-900 mb-6">How It Works</h2>
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto">
+              Simple, fast, and secure. Get your perfect workspace in just four easy steps.
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-            {/* Step 1 */}
-            <div className="text-center">
-              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                </svg>
+          <div className="relative max-w-6xl mx-auto">
+            {/* Connection Line */}
+            <div className="hidden lg:block absolute top-1/2 left-0 right-0 h-px bg-gray-200 transform -translate-y-1/2"></div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+              {/* Step 1 */}
+              <div className="relative bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300 group">
+                <div className="absolute -top-4 left-8 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                  1
+                </div>
+                <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors">
+                  <svg className="w-8 h-8 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Search</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Browse our curated collection of premium workspaces tailored to your needs
+                </p>
               </div>
-              <h3 className="font-semibold mb-2">Choose Available Assets</h3>
-              <p className="text-sm text-gray-500">
-                Select from our wide range of premium workspaces
-              </p>
+
+              {/* Step 2 */}
+              <div className="relative bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300 group">
+                <div className="absolute -top-4 left-8 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                  2
+                </div>
+                <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors">
+                  <Building2 className="w-8 h-8 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Explore</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  View detailed photos, amenities, and verified reviews from real users
+                </p>
+              </div>
+
+              {/* Step 3 */}
+              <div className="relative bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300 group">
+                <div className="absolute -top-4 left-8 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                  3
+                </div>
+                <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors">
+                  <CheckCircle className="w-8 h-8 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Book</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Secure your space instantly with our streamlined booking process
+                </p>
+              </div>
+
+              {/* Step 4 */}
+              <div className="relative bg-white p-8 rounded-2xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all duration-300 group">
+                <div className="absolute -top-4 left-8 bg-blue-500 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
+                  4
+                </div>
+                <div className="w-16 h-16 bg-blue-50 rounded-xl flex items-center justify-center mb-6 group-hover:bg-blue-100 transition-colors">
+                  <Star className="w-8 h-8 text-blue-500" />
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">Enjoy</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Access your professionally managed workspace and focus on what matters
+                </p>
+              </div>
             </div>
 
-            {/* Step 2 */}
-            <div className="text-center">
-              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">Browse Assets</h3>
-              <p className="text-sm text-gray-500">
-                Explore verified spaces and available options
-              </p>
-            </div>
-
-            {/* Step 3 */}
-            <div className="text-center">
-              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">Confirm Booking</h3>
-              <p className="text-sm text-gray-500">
-                Secure your booking with our guided confirmation
-              </p>
-            </div>
-
-            {/* Step 4 */}
-            <div className="text-center">
-              <div className="w-32 h-32 bg-blue-50 rounded-full mx-auto mb-4 flex items-center justify-center">
-                <svg className="w-16 h-16 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <h3 className="font-semibold mb-2">Enjoy Your Space</h3>
-              <p className="text-sm text-gray-500">
-                Relax and enjoy your perfectly planned space
-              </p>
+            {/* Bottom CTA */}
+            <div className="text-center mt-16">
+              <Button 
+                onClick={() => navigate("/spaces")}
+                className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-xl font-medium text-base shadow-sm hover:shadow-md transition-all duration-200"
+              >
+                Start Booking
+                <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
             </div>
           </div>
         </div>
@@ -263,8 +285,14 @@ const Index = () => {
                 type="email"
                 placeholder="Enter your email address"
                 className="flex-grow"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && handleSubscribe()}
               />
-              <Button className="bg-blue-500 hover:bg-blue-600 text-white">
+              <Button 
+                onClick={handleSubscribe}
+                className="bg-blue-500 hover:bg-blue-600 text-white"
+              >
                 Subscribe
               </Button>
             </div>
