@@ -148,7 +148,7 @@ const Index = () => {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="wifi">WiFi</SelectItem>
-                  <SelectItem value="projector">Projector</SelectItem>
+                  <SelectItem value="projector">Projectors</SelectItem>
                   <SelectItem value="whiteboard">Whiteboard</SelectItem>
                 </SelectContent>
               </Select>
