@@ -68,7 +68,8 @@ const MeetingRooms = () => {
     }
   ];
 
-  const selectedRoom = meetingRooms[0];
+  const [selectedRoom, setSelectedRoom] = useState(meetingRooms[0]);
+  const [mainImage, setMainImage] = useState(selectedRoom.image);
 
   // Generate time slots from 9 AM to 5 PM
   const timeSlots = Array.from({ length: 9 }, (_, i) => {
@@ -161,22 +162,12 @@ const MeetingRooms = () => {
     <div className="min-h-screen bg-background">
       <Header />
       <main className="container mx-auto px-4 py-8">
-        <div className="max-w-7xl mx-auto space-y-6">
-          <div className="flex items-center justify-between mb-6">
-            <Button variant="ghost" onClick={() => window.history.back()}>
-              <ChevronLeft className="h-4 w-4 mr-2" /> Back to all spaces
-            </Button>
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-semibold">${selectedRoom.price}</span>
-              <span className="text-muted-foreground">/hr</span>
-            </div>
-          </div>
-
-          <div className="flex flex-col lg:flex-row gap-8">
-            {/* Left Column - Room Header and Image */}
-            <div className="lg:w-1/2 space-y-6">
+        <div className="max-w-7xl mx-auto">
+          <div className="flex flex-col lg:flex-row gap-10">
+            {/* Left Side: Image Gallery, About, Amenities */}
+            <div className="lg:w-1/2 flex flex-col">
               {/* Room Header */}
-              <div className="flex justify-between items-center">
+              <div className="flex justify-between items-center mb-4">
                 <h1 className="text-2xl font-semibold">{selectedRoom.name}</h1>
                 <div className="flex items-center gap-2">
                   <div className="flex items-center text-muted-foreground">
@@ -191,10 +182,10 @@ const MeetingRooms = () => {
                 </div>
               </div>
 
-              {/* Room Image */}
-              <div className="aspect-[16/9] overflow-hidden rounded-lg bg-gray-100">
+              {/* Main Image */}
+              <div className="aspect-[16/9] overflow-hidden rounded-xl bg-gray-100 mb-4">
                 <img
-                  src={selectedRoom.image}
+                  src={mainImage}
                   alt={selectedRoom.name}
                   className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
                   loading="eager"
@@ -204,8 +195,21 @@ const MeetingRooms = () => {
                   }}
                 />
               </div>
+              {/* Sub Images Thumbnails */}
+              <div className="flex gap-3 mb-6">
+                {[selectedRoom.image, "/src/assets/coworking-space.jpg", "/src/assets/meeting-room.jpg"].map((img, idx) => (
+                  <button
+                    key={idx}
+                    className={`w-20 h-14 rounded-lg overflow-hidden border-2 ${mainImage === img ? 'border-blue-500' : 'border-transparent'}`}
+                    onClick={() => setMainImage(img)}
+                    type="button"
+                  >
+                    <img src={img} alt="Preview" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
 
-              {/* Room Details Section */}
+              {/* About & Amenities */}
               <div className="space-y-6">
                 <div>
                   <h3 className="text-xl font-semibold mb-2">About this space</h3>
@@ -225,126 +229,97 @@ const MeetingRooms = () => {
               </div>
             </div>
 
-            {/* Right Column - Calendar and Booking */}
-            <div className="lg:w-1/2">
-              <Card>
-                <CardContent className="p-6">
-                  <div className="space-y-6">
-                      <div>
-                        <h3 className="font-medium mb-4">Select Date & Time</h3>
-                        <div className="flex flex-col lg:flex-row gap-6">
-                          <div className="flex-shrink-0">
-                            <Calendar
-                              mode="single"
-                              selected={selectedDate}
-                              onSelect={handleDateSelect}
-                              className="rounded-md border shadow-sm"
-                              disabled={(date) => date < new Date()}
-                            />
-                          </div>
-                          
-                          <div className="flex-1 bg-gray-50 p-4 rounded-lg border">
-                            <div className="flex items-center justify-between mb-4">
-                              <h3 className="font-medium text-gray-900">Available Time Slots</h3>
-                              <div className="flex items-center gap-2 text-sm text-gray-500">
-                                <div className="flex items-center gap-1">
-                                  <div className="w-3 h-3 rounded-full bg-primary/20"></div>
-                                  <span>Available</span>
-                                </div>
-                                <div className="flex items-center gap-1">
-                                  <div className="w-3 h-3 rounded-full bg-primary"></div>
-                                  <span>Selected</span>
-                                </div>
-                              </div>
-                            </div>
-                            <div className="grid grid-cols-1 gap-2 max-h-[360px] overflow-y-auto pr-2">
-                              {timeSlots.map((time, index) => {
-                                const slotStart = new Date(time);
-                                const slotEnd = addHours(slotStart, 1);
-                                const isSelected = isSlotSelected(slotStart, selectedRoom.id);
-                                const isPast = slotStart < new Date();
-
-                                return (
-                                  <Button
-                                    key={index}
-                                    variant={isSelected ? "default" : "outline"}
-                                    className={`
-                                      justify-between h-auto py-3 px-4
-                                      ${isSelected ? 'bg-primary text-primary-foreground shadow-md' : 'hover:bg-primary/10 hover:text-primary'}
-                                      ${isPast ? 'opacity-50 cursor-not-allowed' : ''}
-                                      text-sm w-full transition-all
-                                    `}
-                                    onClick={() => !isPast && handleSlotClick(slotStart, selectedRoom.id)}
-                                    disabled={isPast}
-                                  >
-                                    <div className="flex items-center gap-3">
-                                      <Clock className="h-4 w-4" />
-                                      <span className="font-medium">{format(slotStart, 'h:mm a')} - {format(slotEnd, 'h:mm a')}</span>
-                                    </div>
-                                    {isSelected && (
-                                      <span className="bg-primary-foreground/10 px-2 py-1 rounded text-xs">
-                                        Selected
-                                      </span>
-                                    )}
-                                  </Button>
-                                );
-                              })}
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                    {selectedSlots.length > 0 && (
-                      <div className="mt-6">
-                        <div className="bg-gray-50 rounded-lg border p-4">
-                          <h3 className="font-medium text-gray-900 mb-4">Booking Summary</h3>
-                          <div className="space-y-4">
-                            <div className="divide-y">
-                              {selectedSlots.map((slot, index) => (
-                                <div key={index} className="flex justify-between items-center py-3">
-                                  <div>
-                                    <p className="font-medium text-gray-900">{format(slot.startTime, 'h:mm a')}</p>
-                                    <p className="text-sm text-gray-500">
-                                      {format(slot.startTime, 'EEEE, MMM d')}
-                                    </p>
-                                  </div>
-                                  <div className="text-right">
-                                    <p className="font-medium">${selectedRoom.price}</p>
-                                    <p className="text-sm text-gray-500">per hour</p>
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-
-                            <div className="space-y-2 pt-3 border-t">
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-600">Space fee ({selectedSlots.length} {selectedSlots.length === 1 ? 'hour' : 'hours'})</span>
-                                <span className="font-medium">${selectedRoom.price * selectedSlots.length}</span>
-                              </div>
-                              <div className="flex justify-between items-center text-sm">
-                                <span className="text-gray-600">Service fee</span>
-                                <span className="font-medium">${(selectedRoom.price * selectedSlots.length * 0.1).toFixed(2)}</span>
-                              </div>
-                              <div className="pt-2 mt-2 border-t">
-                                <div className="flex justify-between items-center">
-                                  <span className="font-semibold text-gray-900">Total</span>
-                                  <span className="font-semibold text-lg">${(selectedRoom.price * selectedSlots.length * 1.1).toFixed(2)}</span>
-                                </div>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
-
-                        <Button 
-                          className="w-full mt-4 bg-primary hover:bg-primary/90" 
-                          size="lg" 
-                          onClick={handleBookNow}
-                        >
-                          Book Now
-                        </Button>
-                      </div>
-                    )}
+            {/* Right Side: Slots, Calendar, Checkout */}
+            <div className="lg:w-1/2 flex flex-col gap-8">
+              <Card className="flex-1">
+                <CardContent className="p-6 flex flex-col gap-8">
+                  {/* Time Slots Horizontal */}
+                  <div>
+                    <h3 className="font-medium mb-4">Select Time Slot</h3>
+                    <div className="flex gap-4 flex-wrap mb-2">
+                      {timeSlots.map((time, index) => {
+                        const slotStart = new Date(time);
+                        const slotEnd = addHours(slotStart, 1);
+                        const isSelected = isSlotSelected(slotStart, selectedRoom.id);
+                        const isPast = slotStart < new Date();
+                        return (
+                          <button
+                            key={index}
+                            className={`min-w-[100px] px-4 py-3 rounded-lg border text-sm font-medium flex flex-col items-center justify-center transition-all duration-200
+                              ${isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-lg' : 'bg-white text-gray-900 border-gray-200 hover:bg-blue-50'}
+                              ${isPast ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
+                            `}
+                            onClick={() => !isPast && handleSlotClick(slotStart, selectedRoom.id)}
+                            disabled={isPast}
+                            type="button"
+                          >
+                            <span>{format(slotStart, 'h a')} - {format(slotEnd, 'h a')}</span>
+                            {isSelected && <span className="mt-1 text-xs font-bold bg-white text-blue-600 px-2 py-0.5 rounded">Selected</span>}
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
+
+                  {/* Calendar Below Slots */}
+                  <div>
+                    <h3 className="font-medium mb-4">Select Date</h3>
+                    <Calendar
+                      mode="single"
+                      selected={selectedDate}
+                      onSelect={handleDateSelect}
+                      className="rounded-md border shadow-sm mx-auto"
+                      disabled={(date) => date < new Date()}
+                    />
+                  </div>
+
+                  {/* Booking Summary & Proceed Button */}
+                  {selectedSlots.length > 0 && (
+                    <div className="mt-2">
+                      <div className="bg-gray-50 rounded-lg border p-4 mb-4">
+                        <h3 className="font-medium text-gray-900 mb-4">Booking Summary</h3>
+                        <div className="space-y-4">
+                          <div className="divide-y">
+                            {selectedSlots.map((slot, index) => (
+                              <div key={index} className="flex justify-between items-center py-3">
+                                <div>
+                                  <p className="font-medium text-gray-900">{format(slot.startTime, 'h:mm a')}</p>
+                                  <p className="text-sm text-gray-500">{format(slot.startTime, 'EEEE, MMM d')}</p>
+                                </div>
+                                <div className="text-right">
+                                  <p className="font-medium">${selectedRoom.price}</p>
+                                  <p className="text-sm text-gray-500">per hour</p>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                          <div className="space-y-2 pt-3 border-t">
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-600">Space fee ({selectedSlots.length} {selectedSlots.length === 1 ? 'hour' : 'hours'})</span>
+                              <span className="font-medium">${selectedRoom.price * selectedSlots.length}</span>
+                            </div>
+                            <div className="flex justify-between items-center text-sm">
+                              <span className="text-gray-600">Service fee</span>
+                              <span className="font-medium">${(selectedRoom.price * selectedSlots.length * 0.1).toFixed(2)}</span>
+                            </div>
+                            <div className="pt-2 mt-2 border-t">
+                              <div className="flex justify-between items-center">
+                                <span className="font-semibold text-gray-900">Total</span>
+                                <span className="font-semibold text-lg">${(selectedRoom.price * selectedSlots.length * 1.1).toFixed(2)}</span>
+                              </div>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                      <Button 
+                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 rounded-lg font-semibold shadow-lg" 
+                        size="lg" 
+                        onClick={handleBookNow}
+                      >
+                        Proceed to Checkout
+                      </Button>
+                    </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
