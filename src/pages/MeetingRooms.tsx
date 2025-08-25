@@ -47,11 +47,11 @@ const MeetingRooms = () => {
       name: "Small Meeting Room",
       image: "/src/assets/meeting-room.jpg",
       description: "Perfect for 4-8 people with HD video conferencing and 55\" 4K display.",
-      rating: 4.7,
-      reviews: 89,
+      rating: 0,
+      reviews: 0,
       price: 50,
       type: "Meeting Room",
-      capacity: "4-8 people",
+      capacity: "8",
       amenities: ["HD Video Conferencing", "55\" 4K Display", "Whiteboard", "Air Conditioning", "Free WiFi"]
     },
     {
@@ -59,11 +59,11 @@ const MeetingRooms = () => {
       name: "Large Conference Room",
       image: "/src/assets/coworking-space.jpg",
       description: "Ideal for 10-20 people with premium AV equipment and 75\" interactive display.",
-      rating: 4.9,
-      reviews: 156,
+      rating: 0,
+      reviews: 0,
       price: 120,
       type: "Conference Room",
-      capacity: "10-20 people",
+      capacity: "12",
       amenities: ["Premium AV Equipment", "75\" Interactive Display", "Recording Equipment", "Catering Available", "Video Conferencing"]
     }
   ];
@@ -71,12 +71,14 @@ const MeetingRooms = () => {
   const [selectedRoom, setSelectedRoom] = useState(meetingRooms[0]);
   const [mainImage, setMainImage] = useState(selectedRoom.image);
 
-  // Generate time slots from 9 AM to 5 PM
+  // Generate time slots from 9 AM to 5 PM with time range
   const timeSlots = Array.from({ length: 9 }, (_, i) => {
     const hour = 9 + i;
     const startTime = new Date(selectedDate);
+    const endTime = new Date(selectedDate);
     startTime.setHours(hour, 0, 0, 0);
-    return startTime;
+    endTime.setHours(hour + 1, 0, 0, 0);
+    return { startTime, endTime };
   });
 
   const handleDateSelect = (date: Date | undefined) => {
@@ -87,13 +89,11 @@ const MeetingRooms = () => {
     }
   };
 
-  const handleSlotClick = (startTime: Date, roomId: number) => {
-    const endTime = addHours(startTime, 1);
-
+  const handleSlotClick = (timeSlot: { startTime: Date, endTime: Date }, roomId: number) => {
     // Check if slot is already selected
     const slotIndex = selectedSlots.findIndex(
-      slot => isSameDay(slot.startTime, startTime) &&
-        slot.startTime.getHours() === startTime.getHours() &&
+      slot => isSameDay(slot.startTime, timeSlot.startTime) &&
+        slot.startTime.getHours() === timeSlot.startTime.getHours() &&
         slot.roomId === roomId
     );
 
@@ -103,19 +103,19 @@ const MeetingRooms = () => {
     } else {
       // Add new slot
       const newSlot: BookingSlot = {
-        id: `${roomId}-${startTime.getTime()}`,
-        startTime,
-        endTime,
+        id: `${roomId}-${timeSlot.startTime.getTime()}`,
+        startTime: timeSlot.startTime,
+        endTime: timeSlot.endTime,
         roomId
       };
       setSelectedSlots(prev => [...prev, newSlot]);
     }
   };
 
-  const isSlotSelected = (startTime: Date, roomId: number) => {
+  const isSlotSelected = (timeSlot: { startTime: Date }, roomId: number) => {
     return selectedSlots.some(
-      slot => isSameDay(slot.startTime, startTime) &&
-        slot.startTime.getHours() === startTime.getHours() &&
+      slot => isSameDay(slot.startTime, timeSlot.startTime) &&
+        slot.startTime.getHours() === timeSlot.startTime.getHours() &&
         slot.roomId === roomId
     );
   };
@@ -163,31 +163,15 @@ const MeetingRooms = () => {
       <Header />
       <main className="container mx-auto px-4 py-8">
         <div className="max-w-7xl mx-auto">
-          <div className="flex flex-col lg:flex-row gap-10">
-            {/* Left Side: Image Gallery, About, Amenities */}
-            <div className="lg:w-1/2 flex flex-col">
-              {/* Room Header */}
-              <div className="flex justify-between items-center mb-4">
-                <h1 className="text-2xl font-semibold">{selectedRoom.name}</h1>
-                <div className="flex items-center gap-2">
-                  <div className="flex items-center text-muted-foreground">
-                    <Users className="h-4 w-4 mr-1" />
-                    <span>{selectedRoom.capacity}</span>
-                  </div>
-                  <div className="flex items-center gap-1">
-                    <Star className="h-4 w-4 text-yellow-500 fill-current" />
-                    <span className="font-medium">{selectedRoom.rating}</span>
-                    <span className="text-muted-foreground">({selectedRoom.reviews})</span>
-                  </div>
-                </div>
-              </div>
-
+          <div className="flex flex-col lg:flex-row gap-8">
+            {/* Left Column: Room Images and Details */}
+            <div className="lg:w-2/3 space-y-6">
               {/* Main Image */}
-              <div className="aspect-[16/9] overflow-hidden rounded-xl bg-gray-100 mb-4">
+              <div className="rounded-xl overflow-hidden bg-gray-100 w-1/2">
                 <img
                   src={mainImage}
                   alt={selectedRoom.name}
-                  className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+                  className="w-full h-[300px] object-cover"
                   loading="eager"
                   onError={(e) => {
                     const target = e.target as HTMLImageElement;
@@ -195,33 +179,40 @@ const MeetingRooms = () => {
                   }}
                 />
               </div>
-              {/* Sub Images Thumbnails */}
-              <div className="flex gap-3 mb-6">
+              
+              {/* Thumbnail Gallery */}
+              <div className="flex gap-3">
                 {[selectedRoom.image, "/src/assets/coworking-space.jpg", "/src/assets/meeting-room.jpg"].map((img, idx) => (
-                  <button
+                  <div
                     key={idx}
-                    className={`w-20 h-14 rounded-lg overflow-hidden border-2 ${mainImage === img ? 'border-blue-500' : 'border-transparent'}`}
                     onClick={() => setMainImage(img)}
-                    type="button"
+                    className={`w-20 h-16 rounded-md overflow-hidden cursor-pointer border-2 ${mainImage === img ? 'border-primary' : 'border-transparent'}`}
                   >
-                    <img src={img} alt="Preview" className="w-full h-full object-cover" />
-                  </button>
+                    <img
+                      src={img}
+                      alt={`Preview ${idx + 1}`}
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
                 ))}
               </div>
 
-              {/* About & Amenities */}
-              <div className="space-y-6">
+              {/* Room Info */}
+              <div className="space-y-6 pt-4">
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">About this space</h3>
-                  <p className="text-gray-600">{selectedRoom.description}</p>
+                  <h2 className="text-2xl font-semibold mb-3">About this space</h2>
+                  <p className="text-muted-foreground">{selectedRoom.description}</p>
                 </div>
+
                 <div>
-                  <h3 className="text-xl font-semibold mb-2">Amenities</h3>
+                  <h3 className="text-xl font-medium mb-4">Amenities</h3>
                   <div className="grid grid-cols-2 gap-4">
-                    {selectedRoom.amenities.map((amenity, index) => (
-                      <div key={index} className="flex items-center gap-2">
-                        <CheckIcon className="h-4 w-4 text-green-500" />
-                        <span>{amenity}</span>
+                    {selectedRoom.amenities.map((amenity, idx) => (
+                      <div key={idx} className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10">
+                          <CheckIcon className="h-4 w-4 text-primary" />
+                        </div>
+                        <span className="text-sm">{amenity}</span>
                       </div>
                     ))}
                   </div>
@@ -229,99 +220,78 @@ const MeetingRooms = () => {
               </div>
             </div>
 
-            {/* Right Side: Slots, Calendar, Checkout */}
-            <div className="lg:w-1/2 flex flex-col gap-8">
-              <Card className="flex-1">
-                <CardContent className="p-6 flex flex-col gap-8">
-                  {/* Time Slots Horizontal */}
-                  <div>
-                    <h3 className="font-medium mb-4">Select Time Slot</h3>
-                    <div className="flex gap-4 flex-wrap mb-2">
-                      {timeSlots.map((time, index) => {
-                        const slotStart = new Date(time);
-                        const slotEnd = addHours(slotStart, 1);
-                        const isSelected = isSlotSelected(slotStart, selectedRoom.id);
-                        const isPast = slotStart < new Date();
-                        return (
-                          <button
-                            key={index}
-                            className={`min-w-[100px] px-4 py-3 rounded-lg border text-sm font-medium flex flex-col items-center justify-center transition-all duration-200
-                              ${isSelected ? 'bg-blue-600 text-white border-blue-600 shadow-lg' : 'bg-white text-gray-900 border-gray-200 hover:bg-blue-50'}
-                              ${isPast ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'}
-                            `}
-                            onClick={() => !isPast && handleSlotClick(slotStart, selectedRoom.id)}
-                            disabled={isPast}
-                            type="button"
-                          >
-                            <span>{format(slotStart, 'h a')} - {format(slotEnd, 'h a')}</span>
-                            {isSelected && <span className="mt-1 text-xs font-bold bg-white text-blue-600 px-2 py-0.5 rounded">Selected</span>}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Calendar Below Slots */}
-                  <div>
-                    <h3 className="font-medium mb-4">Select Date</h3>
-                    <Calendar
-                      mode="single"
-                      selected={selectedDate}
-                      onSelect={handleDateSelect}
-                      className="rounded-md border shadow-sm mx-auto"
-                      disabled={(date) => date < new Date()}
-                    />
-                  </div>
-
-                  {/* Booking Summary & Proceed Button */}
-                  {selectedSlots.length > 0 && (
-                    <div className="mt-2">
-                      <div className="bg-gray-50 rounded-lg border p-4 mb-4">
-                        <h3 className="font-medium text-gray-900 mb-4">Booking Summary</h3>
-                        <div className="space-y-4">
-                          <div className="divide-y">
-                            {selectedSlots.map((slot, index) => (
-                              <div key={index} className="flex justify-between items-center py-3">
-                                <div>
-                                  <p className="font-medium text-gray-900">{format(slot.startTime, 'h:mm a')}</p>
-                                  <p className="text-sm text-gray-500">{format(slot.startTime, 'EEEE, MMM d')}</p>
-                                </div>
-                                <div className="text-right">
-                                  <p className="font-medium">${selectedRoom.price}</p>
-                                  <p className="text-sm text-gray-500">per hour</p>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                          <div className="space-y-2 pt-3 border-t">
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600">Space fee ({selectedSlots.length} {selectedSlots.length === 1 ? 'hour' : 'hours'})</span>
-                              <span className="font-medium">${selectedRoom.price * selectedSlots.length}</span>
-                            </div>
-                            <div className="flex justify-between items-center text-sm">
-                              <span className="text-gray-600">Service fee</span>
-                              <span className="font-medium">${(selectedRoom.price * selectedSlots.length * 0.1).toFixed(2)}</span>
-                            </div>
-                            <div className="pt-2 mt-2 border-t">
-                              <div className="flex justify-between items-center">
-                                <span className="font-semibold text-gray-900">Total</span>
-                                <span className="font-semibold text-lg">${(selectedRoom.price * selectedSlots.length * 1.1).toFixed(2)}</span>
-                              </div>
-                            </div>
-                          </div>
-                        </div>
+            {/* Right Column: Booking Form */}
+            <div className="lg:w-1/3">
+              <div className="sticky top-24">
+                <Card className="border-none shadow-lg">
+                  <CardContent className="p-6">
+                    <div className="flex justify-between items-start mb-6">
+                      <div>
+                        <h2 className="text-2xl font-bold">${selectedRoom.price}<span className="text-base font-normal text-muted-foreground">/hour</span></h2>
                       </div>
-                      <Button 
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white text-lg py-3 rounded-lg font-semibold shadow-lg" 
-                        size="lg" 
-                        onClick={handleBookNow}
-                      >
-                        Proceed to Checkout
-                      </Button>
+                      <div className="text-right">
+                        <div className="font-medium text-lg">{selectedRoom.capacity}</div>
+                        <div className="text-sm text-muted-foreground">people</div>
+                      </div>
                     </div>
-                  )}
-                </CardContent>
-              </Card>
+
+                    {/* Calendar */}
+                    <div className="mb-6">
+                      <Calendar
+                        mode="single"
+                        selected={selectedDate}
+                        onSelect={handleDateSelect}
+                        className="rounded-md border p-4"
+                        disabled={(date) => date < new Date()}
+                      />
+                    </div>
+
+                    {/* Time Slots */}
+                    <div className="mb-6">
+                      <h3 className="font-medium mb-3">Select Time</h3>
+                      <div className="grid grid-cols-1 gap-2">
+                        {timeSlots.map((timeSlot, idx) => {
+                          const isSelected = isSlotSelected(timeSlot, selectedRoom.id);
+                          return (
+                            <Button
+                              key={idx}
+                              variant={isSelected ? "default" : "outline"}
+                              className="h-12 justify-between text-base"
+                              onClick={() => handleSlotClick(timeSlot, selectedRoom.id)}
+                            >
+                              <span>{format(timeSlot.startTime, 'h a')} - {format(timeSlot.endTime, 'h a')}</span>
+                              <span>${selectedRoom.price}/hr</span>
+                            </Button>
+                          );
+                        })}
+                      </div>
+                    </div>
+
+                    {/* Price Summary */}
+                    <div className="space-y-3 mb-6">
+                      <div className="flex justify-between">
+                        <span className="text-muted-foreground">
+                          ${selectedRoom.price} × {selectedSlots.length} hour{selectedSlots.length !== 1 ? 's' : ''}
+                        </span>
+                        <span>${totalPrice}</span>
+                      </div>
+                      <div className="border-t pt-3 flex justify-between font-semibold">
+                        <span>Total</span>
+                        <span>${totalPrice}</span>
+                      </div>
+                    </div>
+
+                    <Button 
+                      className="w-full h-12 text-base font-medium" 
+                      size="lg"
+                      onClick={handleBookNow}
+                      disabled={selectedSlots.length === 0}
+                    >
+                      Proceed to Checkout
+                    </Button>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
           </div>
         </div>
