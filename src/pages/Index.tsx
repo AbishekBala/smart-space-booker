@@ -31,7 +31,7 @@ const Index = () => {
   const { toast } = useToast();
   const [email, setEmail] = useState("");
 
-  const handleSubscribe = () => {
+  const handleSubscribe = async () => {
     if (!email) {
       toast({
         title: "Error",
@@ -50,12 +50,35 @@ const Index = () => {
       return;
     }
 
-    // Here you would typically send the email to your backend
-    toast({
-      title: "Success!",
-      description: "Thank you for subscribing to our newsletter!",
-    });
-    setEmail("");
+    try {
+      // Send notification to your WhatsApp about new subscription
+      const subscriptionMessage = `New Newsletter Subscription!\n\nEmail: ${email}\nTime: ${new Date().toLocaleString()}\nSource: Gigspace Website`;
+      const whatsappNumber = "919677689494";
+      const encodedMessage = encodeURIComponent(subscriptionMessage);
+      const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+      
+      // Open WhatsApp in a new tab to notify you
+      window.open(whatsappUrl, '_blank');
+      
+      // You can also integrate with email services like EmailJS, Mailchimp, or your backend
+      // Example with EmailJS (you'd need to set it up):
+      // await emailjs.send('service_id', 'template_id', {
+      //   user_email: email,
+      //   message: `New subscription from ${email}`
+      // });
+
+      toast({
+        title: "Success!",
+        description: "Thank you for subscribing! You'll receive a confirmation message shortly.",
+      });
+      setEmail("");
+    } catch (error) {
+      toast({
+        title: "Error",
+        description: "Something went wrong. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
   
   const featuredSpaces = [
@@ -260,8 +283,8 @@ const Index = () => {
           <div className="max-w-2xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">Stay Updated</h2>
             <p className="text-gray-600 mb-6">
-              Subscribe for the latest event deals, venue updates, and exclusive offers.
-              Never miss out on the perfect event opportunity.
+              Subscribe for the latest workspace deals, new space announcements, and exclusive offers.
+              Never miss out on the perfect workspace opportunity.
             </p>
             <div className="flex flex-col sm:flex-row gap-4 max-w-md mx-auto">
               <Input

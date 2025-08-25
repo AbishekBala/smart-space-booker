@@ -6,50 +6,122 @@ import { Label } from "@/components/ui/label";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
+import { useState } from "react";
 import { 
   MapPin, 
   Phone, 
   Mail, 
-  Clock,
   MessageSquare,
-  Send
+  Send,
+  ArrowRight
 } from "lucide-react";
 
 const Contact = () => {
   // Scroll to top when component mounts
   useScrollToTop();
   
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    subject: '',
+    message: ''
+  });
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSendMessage = (e: React.FormEvent) => {
+    e.preventDefault();
+    const whatsappNumber = "919677689494";
+    const messageText = `Hello! I'm ${formData.firstName} ${formData.lastName}.\n\nSubject: ${formData.subject}\n\nMessage: ${formData.message}\n\nContact Details:\nEmail: ${formData.email}\nPhone: ${formData.phone}`;
+    const encodedMessage = encodeURIComponent(messageText);
+    const whatsappUrl = `https://wa.me/${whatsappNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+  
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <Header />
       
-      {/* Header Section */}
-      <section className="bg-secondary/50 py-16">
-        <div className="container mx-auto px-4 text-center">
-          <h1 className="text-4xl font-bold mb-4">Contact Us</h1>
-          <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
-            Have questions about our spaces or services? Reach out to our team and we'll get back to you as soon as possible.
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-r from-blue-600 to-purple-600 py-20 overflow-hidden">
+        <div className="absolute inset-0 bg-black/10"></div>
+        <div className="container mx-auto px-4 text-center relative z-10">
+          <h1 className="text-5xl font-bold text-white mb-6">Get In Touch</h1>
+          <p className="text-xl text-blue-100 max-w-2xl mx-auto leading-relaxed">
+            Ready to transform your workspace experience? Let's start a conversation.
           </p>
         </div>
+        <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full -translate-y-32 translate-x-32"></div>
+        <div className="absolute bottom-0 left-0 w-48 h-48 bg-white/5 rounded-full translate-y-24 -translate-x-24"></div>
       </section>
 
-      <div className="container mx-auto px-4 py-16">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
-          {/* Contact Information */}
-          <div className="lg:col-span-1 space-y-8">
-            <Card>
-              <CardHeader>
-                <CardTitle className="flex items-center">
-                  <MessageSquare className="h-5 w-5 mr-2" />
-                  Contact Information
-                </CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-6">
-                <div className="flex items-start space-x-4">
-                  <MapPin className="h-5 w-5 text-primary mt-1" />
+      <div className="container mx-auto px-4 py-20">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 max-w-7xl mx-auto">
+          {/* Contact Information - Left Side */}
+          <div className="space-y-6">
+            {/* Quick Contact Cards */}
+            <div className="grid grid-cols-1 gap-4">
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center group-hover:bg-blue-200 transition-colors">
+                      <Phone className="h-6 w-6 text-blue-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Call Us</h3>
+                      <p className="text-gray-600 text-sm">+91 96776 89494</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center group-hover:bg-green-200 transition-colors">
+                      <MessageSquare className="h-6 w-6 text-green-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">WhatsApp</h3>
+                      <p className="text-gray-600 text-sm">Quick Support</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              <Card className="group hover:shadow-lg transition-all duration-300 border-0 shadow-md bg-white">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-4">
+                    <div className="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
+                      <Mail className="h-6 w-6 text-purple-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-semibold text-gray-900">Email</h3>
+                      <p className="text-gray-600 text-sm">info@gigspace.com</p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Location & Map */}
+            <Card className="border-0 shadow-lg bg-white">
+              <CardContent className="p-6">
+                <div className="flex items-start space-x-4 mb-6">
+                  <div className="w-12 h-12 bg-red-100 rounded-xl flex items-center justify-center">
+                    <MapPin className="h-6 w-6 text-red-600" />
+                  </div>
                   <div>
-                    <h3 className="font-medium mb-1">Address</h3>
-                    <p className="text-muted-foreground">
+                    <h3 className="font-semibold text-gray-900 mb-2">Visit Our Office</h3>
+                    <p className="text-gray-600 text-sm leading-relaxed">
                       5th floor, Shalimar Complex,<br />
                       near Old Ganesh Medical, Kankanady,<br />
                       Mangaluru, Karnataka 575002
@@ -57,161 +129,132 @@ const Contact = () => {
                   </div>
                 </div>
                 
-                <div className="flex items-start space-x-4">
-                  <Phone className="h-5 w-5 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-medium mb-1">Phone</h3>
-                    <p className="text-muted-foreground">
-                      Main: 09980237030<br />
-                      Support: 09980237030
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <Mail className="h-5 w-5 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-medium mb-1">Email</h3>
-                    <p className="text-muted-foreground">
-                      General: info@gigspace.com<br />
-                      Bookings: bookings@gigspace.com
-                    </p>
-                  </div>
-                </div>
-                
-                <div className="flex items-start space-x-4">
-                  <Clock className="h-5 w-5 text-primary mt-1" />
-                  <div>
-                    <h3 className="font-medium mb-1">Hours</h3>
-                    <p className="text-muted-foreground">
-                      Monday - Friday: 8am - 8pm<br />
-                      Saturday: 9am - 5pm<br />
-                      Sunday: Closed
-                    </p>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Connect With Us */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Connect With Us</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-muted-foreground mb-4">
-                  Get in touch through our social media channels.
-                </p>
-                <div className="flex flex-col space-y-3">
-                  <a href="https://wa.me/919980237030" className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors">
-                    <div className="w-10 h-10 bg-green-500 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">W</span>
-                    </div>
-                    <span>WhatsApp</span>
-                  </a>
-                  <a href="https://linkedin.com/company/gigspace" className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors">
-                    <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-                      <span className="text-white font-bold text-sm">in</span>
-                    </div>
-                    <span>LinkedIn</span>
-                  </a>
-                  <a href="mailto:info@gigspace.com" className="flex items-center space-x-3 text-muted-foreground hover:text-primary transition-colors">
-                    <div className="w-10 h-10 bg-gray-600 rounded-full flex items-center justify-center">
-                      <Mail className="h-5 w-5 text-white" />
-                    </div>
-                    <span>Email</span>
-                  </a>
+                {/* Enhanced Map */}
+                <div className="relative rounded-xl overflow-hidden border border-gray-200">
+                  <iframe 
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3145.1192175303563!2d74.85561480948891!3d12.868058217089825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba35b08f42d4aab%3A0x5531aeacffeee4f5!2sGigabyte%20Labs%20Private%20Limited!5e1!3m2!1sen!2sin!4v1755078609619!5m2!1sen!2sin" 
+                    width="100%" 
+                    height="250" 
+                    style={{border:0}} 
+                    allowFullScreen={true}
+                    loading="lazy" 
+                    referrerPolicy="no-referrer-when-downgrade"
+                    title="Gigspace Location"
+                    className="w-full"
+                  ></iframe>
                 </div>
               </CardContent>
             </Card>
           </div>
           
-          {/* Contact Form */}
-          <div className="lg:col-span-2">
-            <Card>
-              <CardHeader>
-                <CardTitle>Send Us a Message</CardTitle>
+          {/* Contact Form - Right Side */}
+          <div className="flex flex-col">
+            <Card className="border-0 shadow-lg bg-white flex-1">
+              <CardHeader className="pb-6 px-6 pt-6">
+                <CardTitle className="text-2xl font-bold text-gray-900">Send us a message</CardTitle>
+                <p className="text-gray-600">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
               </CardHeader>
-              <CardContent>
-                <form className="space-y-6">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <CardContent className="px-6 pb-6 flex-1 flex flex-col">
+                <form onSubmit={handleSendMessage} className="space-y-6 flex-1 flex flex-col">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="firstName">First Name</Label>
-                      <Input id="firstName" placeholder="Enter your first name" />
+                      <Label htmlFor="firstName" className="text-sm font-medium text-gray-700">First Name</Label>
+                      <Input 
+                        id="firstName" 
+                        name="firstName"
+                        placeholder="Enter your first name" 
+                        className="h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.firstName}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="lastName">Last Name</Label>
-                      <Input id="lastName" placeholder="Enter your last name" />
+                      <Label htmlFor="lastName" className="text-sm font-medium text-gray-700">Last Name</Label>
+                      <Input 
+                        id="lastName" 
+                        name="lastName"
+                        placeholder="Enter your last name" 
+                        className="h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.lastName}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                   </div>
                   
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label htmlFor="email">Email Address</Label>
-                      <Input id="email" type="email" placeholder="Enter your email address" />
+                      <Label htmlFor="email" className="text-sm font-medium text-gray-700">Email Address</Label>
+                      <Input 
+                        id="email" 
+                        name="email"
+                        type="email" 
+                        placeholder="Enter your email address" 
+                        className="h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="phone">Phone Number</Label>
-                      <Input id="phone" placeholder="Enter your phone number" />
+                      <Label htmlFor="phone" className="text-sm font-medium text-gray-700">Phone Number</Label>
+                      <Input 
+                        id="phone" 
+                        name="phone"
+                        placeholder="Enter your phone number" 
+                        className="h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                        value={formData.phone}
+                        onChange={handleInputChange}
+                        required
+                      />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="subject">Subject</Label>
-                    <Input id="subject" placeholder="What is your message about?" />
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="message">Message</Label>
-                    <Textarea 
-                      id="message" 
-                      placeholder="Type your message here..." 
-                      className="min-h-32"
+                    <Label htmlFor="subject" className="text-sm font-medium text-gray-700">Subject</Label>
+                    <Input 
+                      id="subject" 
+                      name="subject"
+                      placeholder="What would you like to discuss?" 
+                      className="h-11 border-gray-200 focus:border-blue-500 focus:ring-blue-500"
+                      value={formData.subject}
+                      onChange={handleInputChange}
+                      required
                     />
                   </div>
                   
-                  <div className="flex items-center space-x-2">
-                    <input type="checkbox" id="privacy" className="rounded" />
-                    <Label htmlFor="privacy" className="text-sm">
-                      I agree to the{" "}
-                      <a href="/privacy" className="text-primary hover:underline">
-                        Privacy Policy
-                      </a>{" "}
-                      and{" "}
-                      <a href="/terms" className="text-primary hover:underline">
-                        Terms of Service
-                      </a>
-                    </Label>
+                  <div className="space-y-2 flex-1 flex flex-col">
+                    <Label htmlFor="message" className="text-sm font-medium text-gray-700">Message</Label>
+                    <Textarea 
+                      id="message" 
+                      name="message"
+                      placeholder="Tell us more about your requirements..." 
+                      className="border-gray-200 focus:border-blue-500 focus:ring-blue-500 resize-none flex-1 min-h-[120px]"
+                      value={formData.message}
+                      onChange={handleInputChange}
+                      required
+                    />
                   </div>
                   
-                  <Button className="w-full">
-                    <Send className="h-4 w-4 mr-2" />
-                    Send Message
-                  </Button>
+                  <div className="mt-auto pt-4">
+                    <Button 
+                      type="submit" 
+                      className="w-full h-12 bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-medium rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl"
+                    >
+                      <Send className="h-4 w-4 mr-2" />
+                      Send via WhatsApp
+                      <ArrowRight className="h-4 w-4 ml-2" />
+                    </Button>
+                    
+                    <p className="text-xs text-gray-500 text-center mt-3">
+                      By clicking send, you'll be redirected to WhatsApp to complete your message.
+                    </p>
+                  </div>
                 </form>
               </CardContent>
             </Card>
           </div>
-        </div>
-        
-        {/* Map Section */}
-        <div className="mt-16">
-          <Card>
-            <CardContent className="p-0">
-              <div className="aspect-video rounded-lg overflow-hidden">
-                <iframe 
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3145.1192175303563!2d74.85561480948891!3d12.868058217089825!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3ba35b08f42d4aab%3A0x5531aeacffeee4f5!2sGigabyte%20Labs%20Private%20Limited!5e1!3m2!1sen!2sin!4v1755078609619!5m2!1sen!2sin" 
-                  width="100%" 
-                  height="100%" 
-                  style={{border:0}} 
-                  allowFullScreen={true}
-                  loading="lazy" 
-                  referrerPolicy="no-referrer-when-downgrade"
-                  title="Gigspace Location"
-                ></iframe>
-              </div>
-            </CardContent>
-          </Card>
         </div>
       </div>
       
