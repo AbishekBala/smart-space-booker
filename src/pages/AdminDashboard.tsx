@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Calendar } from "@/components/ui/calendar";
+// Calendar removed per requirement
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -39,6 +39,53 @@ import {
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
   const [currentStep, setCurrentStep] = useState(1);
+    const [savedAssets, setSavedAssets] = useState<Array<{
+      id: string;
+      name: string;
+      type: string;
+      location: string;
+      capacity: string;
+      description: string;
+      basePrice: string;
+      currency: string;
+      amenities: string[];
+      images: File[];
+      slots: Array<{
+        id: string;
+        name: string;
+        date: Date;
+        slots: string[];
+        type: 'daily' | 'hourly';
+        hoursCount: number;
+      }>;
+    }>>([
+      {
+        id: 'sample-1',
+        name: 'Executive Conference Room',
+        type: 'conference-room',
+        location: 'floor-2',
+        capacity: '10-12',
+        description: 'Premium conference room equipped with 4K display, video conferencing, and whiteboard.',
+        basePrice: '120',
+        currency: 'USD',
+        amenities: ['wifi', 'projector', 'whiteboard', 'security', 'parking'],
+        images: [],
+        slots: [],
+      },
+      {
+        id: 'sample-2',
+        name: 'Private Office Suite',
+        type: 'private-office',
+        location: 'floor-3',
+        capacity: '4-6',
+        description: 'Quiet private office with ergonomic chairs, dedicated AC, and secure access.',
+        basePrice: '75',
+        currency: 'USD',
+        amenities: ['wifi', 'ac', 'security', 'accessibility'],
+        images: [],
+        slots: [],
+      },
+    ]);
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [availabilityMode, setAvailabilityMode] = useState("daily");
@@ -65,14 +112,104 @@ const AdminDashboard = () => {
     basePrice: "",
     currency: "USD",
   });
-  const [pricingForm, setPricingForm] = useState({
-    basePrice: "150.00",
-    currency: "USD",
-    pricingType: "per-night",
-    priceIncludesTaxes: true,
-    taxRate: "8.00",
-    taxDescription: "VAT, GST, Sales Tax"
-  });
+  const [isEditing, setIsEditing] = useState(false);
+  const [editingAssetId, setEditingAssetId] = useState<string | null>(null);
+  const [showAssetDialog, setShowAssetDialog] = useState(false);
+  const [assetToView, setAssetToView] = useState<null | {
+    id: string;
+    name: string;
+    type: string;
+    location: string;
+    capacity: string;
+    description: string;
+    basePrice: string;
+    currency: string;
+    amenities: string[];
+    images: File[];
+    slots: Array<{
+      id: string;
+      name: string;
+      date: Date;
+      slots: string[];
+      type: 'daily' | 'hourly';
+      hoursCount: number;
+    }>;
+  }>(null);
+  const [showEditDialog, setShowEditDialog] = useState(false);
+  const [activeEditTab, setActiveEditTab] = useState<'basic' | 'amenities' | 'availability'>('basic');
+
+  const resetAssetBuilder = () => {
+    setAssetForm({
+      name: "",
+      type: "",
+      location: "",
+      capacity: "",
+      description: "",
+      basePrice: "",
+      currency: "USD",
+    });
+    setSelectedAmenities([]);
+    setUploadedImages([]);
+    setAvailabilityMode("daily");
+    setSelectedTimeSlots([]);
+    setSelectedDate(new Date());
+    setSelectedDailySlot("");
+    setSavedSlots([]);
+    setIsEditing(false);
+    setEditingAssetId(null);
+    setCurrentStep(1);
+  };
+
+  const handleSaveAsset = () => {
+    const assetId = isEditing && editingAssetId ? editingAssetId : Date.now().toString();
+    const newAsset = {
+      id: assetId,
+      name: assetForm.name.trim(),
+      type: assetForm.type,
+      location: assetForm.location,
+      capacity: assetForm.capacity,
+      description: assetForm.description,
+      basePrice: assetForm.basePrice,
+      currency: assetForm.currency,
+      amenities: [...selectedAmenities],
+      images: [...uploadedImages],
+      slots: [...savedSlots],
+    };
+
+    setSavedAssets(prev => {
+      if (isEditing && editingAssetId) {
+        return prev.map(a => (a.id === editingAssetId ? newAsset : a));
+      }
+      return [newAsset, ...prev];
+    });
+
+    resetAssetBuilder();
+    setActiveTab("assets");
+    alert(isEditing ? "Asset updated successfully!" : "Asset created successfully!");
+  };
+
+  const handleEditAsset = (assetId: string) => {
+    const asset = savedAssets.find(a => a.id === assetId);
+    if (!asset) return;
+    setIsEditing(true);
+    setEditingAssetId(asset.id);
+    setAssetForm({
+      name: asset.name,
+      type: asset.type,
+      location: asset.location,
+      capacity: asset.capacity,
+      description: asset.description,
+      basePrice: asset.basePrice,
+      currency: asset.currency,
+    });
+    setSelectedAmenities(asset.amenities);
+    setUploadedImages(asset.images);
+    setSavedSlots(asset.slots);
+    setAvailabilityMode("daily");
+    setSelectedDailySlot("");
+    setActiveEditTab('basic');
+    setShowEditDialog(true);
+  };
 
   const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -86,13 +223,6 @@ const AdminDashboard = () => {
         { id: "create-asset", label: "Create New Asset", icon: Plus }
       ]
     },
-    { id: "availability", label: "Availability", icon: CalendarIcon },
-    { id: "pricing", label: "Pricing & Details", icon: BarChart3 },
-    { id: "amenities", label: "Amenities", icon: Wifi },
-    { id: "analytics", label: "Analytics", icon: BarChart3 },
-    { id: "settings", label: "Settings", icon: Settings },
-    { id: "user-management", label: "User Management", icon: Users },
-    { id: "help", label: "Help & Support", icon: HelpCircle },
   ];
 
   const commonAmenities = [
@@ -126,7 +256,7 @@ const AdminDashboard = () => {
 
   const renderStepIndicator = () => (
     <div className="flex items-center space-x-4 mb-8">
-      {[1, 2, 3, 4].map((step) => (
+      {[1, 2, 3].map((step) => (
         <div key={step} className="flex items-center">
           <div 
             className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${
@@ -141,9 +271,8 @@ const AdminDashboard = () => {
             {step === 1 && "Basic Information"}
             {step === 2 && "Amenities"}
             {step === 3 && "Availability"}
-            {step === 4 && "Pricing"}
           </span>
-          {step < 4 && <div className="w-12 h-px bg-gray-300 ml-4" />}
+          {step < 3 && <div className="w-12 h-px bg-gray-300 ml-4" />}
         </div>
       ))}
     </div>
@@ -189,7 +318,7 @@ const AdminDashboard = () => {
 
         <div className="space-y-2">
           <Label htmlFor="location">Location *</Label>
-          <Select>
+          <Select value={assetForm.location} onValueChange={(value) => setAssetForm(prev => ({ ...prev, location: value }))}>
             <SelectTrigger>
               <SelectValue placeholder="Select location" />
             </SelectTrigger>
@@ -204,7 +333,7 @@ const AdminDashboard = () => {
 
         <div className="space-y-2">
           <Label htmlFor="capacity">Capacity *</Label>
-          <Select>
+          <Select value={assetForm.capacity} onValueChange={(value) => setAssetForm(prev => ({ ...prev, capacity: value }))}>
             <SelectTrigger>
               <SelectValue placeholder="Number of people" />
             </SelectTrigger>
@@ -393,11 +522,6 @@ const AdminDashboard = () => {
     };
 
     const saveSlot = () => {
-      if (!selectedDate) {
-        alert('Please select a date before saving.');
-        return;
-      }
-      
       if (availabilityMode === "daily" && !selectedDailySlot) {
         alert('Please select a daily slot before saving.');
         return;
@@ -420,7 +544,7 @@ const AdminDashboard = () => {
       const newSlot = {
         id: Date.now().toString(),
         name: slotName.trim(),
-        date: selectedDate!,
+        date: new Date(),
         slots: [...selectedTimeSlots],
         type: availabilityMode as 'daily' | 'hourly',
         hoursCount: calculateSelectedHours()
@@ -445,7 +569,6 @@ const AdminDashboard = () => {
     };
 
     const loadSlot = (slot: typeof savedSlots[0]) => {
-      setSelectedDate(slot.date);
       setSelectedTimeSlots(slot.slots);
       setAvailabilityMode(slot.type);
       
@@ -498,20 +621,9 @@ const AdminDashboard = () => {
             </div>
 
             {/* Daily/Hourly Slot Interface */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-              {/* Calendar Section */}
-              <div className="lg:col-span-1">
-                <h3 className="text-lg font-medium mb-4">Select Date</h3>
-                <Calendar
-                  mode="single"
-                  selected={selectedDate}
-                  onSelect={setSelectedDate}
-                  className="rounded-md border"
-                />
-              </div>
-
+            <div className="grid grid-cols-1 gap-6">
               {/* Time Slots Section */}
-              <div className="lg:col-span-2">
+              <div className="col-span-1">
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-lg font-medium">Available Time Slots</h3>
                   <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
@@ -591,7 +703,6 @@ const AdminDashboard = () => {
                   <Button
                     onClick={saveSlot}
                     disabled={
-                      !selectedDate || 
                       (availabilityMode === "daily" && !selectedDailySlot) ||
                       (availabilityMode === "hourly" && selectedTimeSlots.length === 0)
                     }
@@ -615,9 +726,7 @@ const AdminDashboard = () => {
                     <div className="flex items-start justify-between mb-3">
                       <div>
                         <h4 className="font-medium text-gray-900">{slot.name}</h4>
-                        <p className="text-sm text-gray-500">
-                          {slot.date.toLocaleDateString()} • {slot.type === 'daily' ? 'Daily' : 'Hourly'} Mode
-                        </p>
+                        <p className="text-sm text-gray-500">{slot.type === 'daily' ? 'Daily' : 'Hourly'} Mode</p>
                       </div>
                       <div className="flex space-x-1">
                         <Button
@@ -689,9 +798,7 @@ const AdminDashboard = () => {
                 Select All
               </Button>
             </div>
-            <div className="text-sm text-gray-500">
-              {selectedDate?.toLocaleDateString()} • {calculateSelectedHours()} hours selected • {savedSlots.length} saved configurations
-            </div>
+            <div className="text-sm text-gray-500">{calculateSelectedHours()} hours selected • {savedSlots.length} saved configurations</div>
           </div>
 
           {/* Save Slot Name Dialog */}
@@ -719,7 +826,6 @@ const AdminDashboard = () => {
                   />
                 </div>
                 <div className="text-sm text-gray-500">
-                  <p><strong>Date:</strong> {selectedDate?.toLocaleDateString()}</p>
                   <p><strong>Mode:</strong> {availabilityMode === 'daily' ? 'Daily Slots' : 'Hourly Slots'}</p>
                   <p><strong>Hours:</strong> {calculateSelectedHours()} {calculateSelectedHours() === 1 ? 'hour' : 'hours'} selected</p>
                 </div>
@@ -739,491 +845,6 @@ const AdminDashboard = () => {
       </Card>
     );
   };
-
-  const renderPricing = () => (
-    <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      {/* Left Side - Pricing Configuration */}
-      <div className="space-y-6">
-        {/* Base Pricing */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Base Pricing</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="base-price">Base Price *</Label>
-                <Input 
-                  id="base-price" 
-                  value={pricingForm.basePrice}
-                  onChange={(e) => setPricingForm(prev => ({ ...prev, basePrice: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="currency">Currency *</Label>
-                <Select 
-                  value={pricingForm.currency}
-                  onValueChange={(value) => setPricingForm(prev => ({ ...prev, currency: value }))}
-                >
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="USD">USD - US Dollar</SelectItem>
-                    <SelectItem value="EUR">EUR - Euro</SelectItem>
-                    <SelectItem value="GBP">GBP - British Pound</SelectItem>
-                    <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-
-            <div>
-              <Label className="text-sm font-medium">Pricing Type</Label>
-              <div className="flex space-x-4 mt-2">
-                <div className="flex items-center space-x-2">
-                  <input 
-                    type="radio" 
-                    id="per-night" 
-                    name="pricingType" 
-                    value="per-night"
-                    checked={pricingForm.pricingType === "per-night"}
-                    onChange={(e) => setPricingForm(prev => ({ ...prev, pricingType: e.target.value }))}
-                  />
-                  <Label htmlFor="per-night" className="text-sm">Per Night</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input 
-                    type="radio" 
-                    id="per-time-slot" 
-                    name="pricingType" 
-                    value="per-time-slot"
-                    checked={pricingForm.pricingType === "per-time-slot"}
-                    onChange={(e) => setPricingForm(prev => ({ ...prev, pricingType: e.target.value }))}
-                  />
-                  <Label htmlFor="per-time-slot" className="text-sm">Per Time Slot</Label>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <input 
-                    type="radio" 
-                    id="per-day" 
-                    name="pricingType" 
-                    value="per-day"
-                    checked={pricingForm.pricingType === "per-day"}
-                    onChange={(e) => setPricingForm(prev => ({ ...prev, pricingType: e.target.value }))}
-                  />
-                  <Label htmlFor="per-day" className="text-sm">Per Day</Label>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Tax Settings */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Tax Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="flex items-center space-x-4">
-              <Checkbox 
-                id="price-includes-taxes"
-                checked={pricingForm.priceIncludesTaxes}
-                onCheckedChange={(checked) => setPricingForm(prev => ({ ...prev, priceIncludesTaxes: checked as boolean }))}
-              />
-              <Label htmlFor="price-includes-taxes">Price includes taxes</Label>
-              <Checkbox id="tax-exempt" />
-              <Label htmlFor="tax-exempt">Tax exempt</Label>
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="tax-rate">Tax Rate (%)</Label>
-                <Input 
-                  id="tax-rate" 
-                  value={pricingForm.taxRate}
-                  onChange={(e) => setPricingForm(prev => ({ ...prev, taxRate: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="tax-description">Tax Description</Label>
-                <Input 
-                  id="tax-description" 
-                  placeholder="e.g. VAT, GST, Sales Tax"
-                  value={pricingForm.taxDescription}
-                  onChange={(e) => setPricingForm(prev => ({ ...prev, taxDescription: e.target.value }))}
-                />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Price Adjustments - Seasonal Pricing */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Price Adjustments</CardTitle>
-            <CardDescription>Seasonal Pricing</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-600 mb-2">
-              <div className="col-span-3">Season Name</div>
-              <div className="col-span-2">Start Date</div>
-              <div className="col-span-2">End Date</div>
-              <div className="col-span-2">Adjustment</div>
-              <div className="col-span-3"></div>
-            </div>
-            
-            <div className="border rounded-lg p-3">
-              <div className="grid grid-cols-12 gap-2 items-center">
-                <Input className="col-span-3" defaultValue="Summer Peak" />
-                <Input className="col-span-2" type="date" defaultValue="2025-06-01" />
-                <Input className="col-span-2" type="date" defaultValue="2025-08-31" />
-                <div className="col-span-2 flex items-center space-x-1">
-                  <Input defaultValue="25" className="w-12" />
-                  <span className="text-sm">%</span>
-                </div>
-                <Button variant="outline" size="sm" className="col-span-3">Remove</Button>
-              </div>
-            </div>
-            
-            <div className="border rounded-lg p-3">
-              <div className="grid grid-cols-12 gap-2 items-center">
-                <Input className="col-span-3" defaultValue="Winter Holiday" />
-                <Input className="col-span-2" type="date" defaultValue="2025-12-15" />
-                <Input className="col-span-2" type="date" defaultValue="2026-01-05" />
-                <div className="col-span-2 flex items-center space-x-1">
-                  <Input defaultValue="50" className="w-12" />
-                  <span className="text-sm">%</span>
-                </div>
-                <Button variant="outline" size="sm" className="col-span-3">Remove</Button>
-              </div>
-            </div>
-            
-            <Button variant="outline" size="sm">Add Seasonal Price</Button>
-          </CardContent>
-        </Card>
-
-        {/* Promotional Discounts */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Promotional Discounts</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-600 mb-2">
-              <div className="col-span-3">Promotion Name</div>
-              <div className="col-span-2">Start Date</div>
-              <div className="col-span-2">End Date</div>
-              <div className="col-span-2">Discount</div>
-              <div className="col-span-3">Status</div>
-            </div>
-            
-            <div className="border rounded-lg p-3">
-              <div className="grid grid-cols-12 gap-2 items-center">
-                <Input className="col-span-3" defaultValue="Early Bird Special" />
-                <Input className="col-span-2" type="date" defaultValue="2025-05-01" />
-                <Input className="col-span-2" type="date" defaultValue="2025-05-31" />
-                <div className="col-span-2 flex items-center space-x-1">
-                  <Input defaultValue="15" className="w-12" />
-                  <span className="text-sm">%</span>
-                </div>
-                <Select defaultValue="active">
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="inactive">Inactive</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <div className="border rounded-lg p-3">
-              <div className="grid grid-cols-12 gap-2 items-center">
-                <Input className="col-span-3" defaultValue="Last Minute Deal" />
-                <Input className="col-span-2" type="date" defaultValue="2025-06-15" />
-                <Input className="col-span-2" type="date" defaultValue="2025-06-30" />
-                <div className="col-span-2 flex items-center space-x-1">
-                  <Input defaultValue="20" className="w-12" />
-                  <span className="text-sm">%</span>
-                </div>
-                <Select defaultValue="scheduled">
-                  <SelectTrigger className="col-span-3">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="active">Active</SelectItem>
-                    <SelectItem value="scheduled">Scheduled</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            
-            <Button variant="outline" size="sm">Add Promotion</Button>
-          </CardContent>
-        </Card>
-
-        {/* Length of Stay Discounts */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Length of Stay Discounts</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="grid grid-cols-3 gap-4">
-              <div className="space-y-2">
-                <Label>Weekly Discount (7+ nights)</Label>
-                <div className="flex items-center space-x-1">
-                  <Input defaultValue="10" className="w-16" />
-                  <span className="text-sm">%</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Monthly Discount (28+ nights)</Label>
-                <div className="flex items-center space-x-1">
-                  <Input defaultValue="25" className="w-16" />
-                  <span className="text-sm">%</span>
-                </div>
-              </div>
-              <div className="space-y-2">
-                <Label>Custom (specify nights)</Label>
-                <div className="flex items-center space-x-1">
-                  <Input defaultValue="14" className="w-16" />
-                  <Input defaultValue="15" className="w-16" />
-                  <span className="text-sm">%</span>
-                </div>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Additional Details */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Additional Details</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="cancellation-policy">Cancellation Policy*</Label>
-              <Select>
-                <SelectTrigger>
-                  <SelectValue placeholder="Flexible - Full refund 24 hours prior to arrival" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="flexible">Flexible - Full refund 24 hours prior to arrival</SelectItem>
-                  <SelectItem value="moderate">Moderate - Full refund 5 days prior to arrival</SelectItem>
-                  <SelectItem value="strict">Strict - 50% refund until 1 week prior to arrival</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="custom-cancellation">Custom Cancellation Policy</Label>
-              <Textarea 
-                id="custom-cancellation"
-                placeholder="Describe your custom cancellation policy here..."
-                className="min-h-[80px]"
-              />
-            </div>
-
-            <div>
-              <h4 className="font-medium mb-3">Additional Fees</h4>
-              <div className="grid grid-cols-12 gap-2 text-xs font-medium text-gray-600 mb-2">
-                <div className="col-span-3">Fee Name</div>
-                <div className="col-span-2">Amount</div>
-                <div className="col-span-3">Type</div>
-                <div className="col-span-2">Taxable</div>
-                <div className="col-span-2"></div>
-              </div>
-              
-              <div className="space-y-2">
-                <div className="grid grid-cols-12 gap-2 items-center">
-                  <Input className="col-span-3" defaultValue="Cleaning Fee" />
-                  <Input className="col-span-2" defaultValue="75.00" />
-                  <Select defaultValue="per-stay">
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="per-stay">Per Stay</SelectItem>
-                      <SelectItem value="per-night">Per Night</SelectItem>
-                      <SelectItem value="per-person">Per Person</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Checkbox defaultChecked className="col-span-2" />
-                  <Button variant="outline" size="sm" className="col-span-2">Remove</Button>
-                </div>
-                
-                <div className="grid grid-cols-12 gap-2 items-center">
-                  <Input className="col-span-3" defaultValue="Security Deposit" />
-                  <Input className="col-span-2" defaultValue="250.00" />
-                  <Select defaultValue="per-stay">
-                    <SelectTrigger className="col-span-3">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="per-stay">Per Stay</SelectItem>
-                      <SelectItem value="per-night">Per Night</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <Checkbox defaultChecked className="col-span-2" />
-                  <Button variant="outline" size="sm" className="col-span-2">Remove</Button>
-                </div>
-              </div>
-              
-              <Button variant="outline" size="sm" className="mt-2">Add Fee</Button>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="internal-notes">Notes for Internal Use</Label>
-              <Textarea 
-                id="internal-notes"
-                placeholder="Add any internal notes about pricing or special conditions..."
-                className="min-h-[60px]"
-              />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Right Side - Pricing Preview */}
-      <div>
-        <div className="sticky top-4">
-          <Card>
-            <CardHeader>
-              <CardTitle>Pricing Preview</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6">
-              <div className="space-y-3">
-                <div className="flex justify-between">
-                  <span>Base Price</span>
-                  <span className="font-medium">${pricingForm.basePrice}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Cleaning Fee</span>
-                  <span>$75.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Security Deposit</span>
-                  <span>$250.00</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Tax ({pricingForm.taxRate}%)</span>
-                  <span>${(parseFloat(pricingForm.basePrice) * parseFloat(pricingForm.taxRate) / 100).toFixed(2)}</span>
-                </div>
-                <Separator />
-                <div className="flex justify-between font-medium text-blue-600">
-                  <span>Total ({pricingForm.pricingType})</span>
-                  <span>${(parseFloat(pricingForm.basePrice) + 75 + (parseFloat(pricingForm.basePrice) * parseFloat(pricingForm.taxRate) / 100)).toFixed(2)}</span>
-                </div>
-              </div>
-
-              <Separator />
-
-              <div>
-                <h4 className="font-medium mb-3">Sample Calculations</h4>
-                <div className="space-y-4 text-sm">
-                  <div>
-                    <div className="font-medium">Regular Session (1 night)</div>
-                    <div className="flex justify-between">
-                      <span>Base Price</span>
-                      <span>${pricingForm.basePrice}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Fees</span>
-                      <span>$75.00</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Taxes</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * parseFloat(pricingForm.taxRate) / 100).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-medium">
-                      <span>Total</span>
-                      <span>${(parseFloat(pricingForm.basePrice) + 75 + (parseFloat(pricingForm.basePrice) * parseFloat(pricingForm.taxRate) / 100)).toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <div className="font-medium">Summer Peak (1 night)</div>
-                    <div className="flex justify-between">
-                      <span>Base Price</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * 1.25).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Weekly Discount (-10%)</span>
-                      <span>-${(parseFloat(pricingForm.basePrice) * 1.25 * 0.1).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Fees</span>
-                      <span>$75.00</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Taxes</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * 1.15 * parseFloat(pricingForm.taxRate) / 100).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-medium">
-                      <span>Total</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * 1.15 + 75 + (parseFloat(pricingForm.basePrice) * 1.15 * parseFloat(pricingForm.taxRate) / 100)).toFixed(2)}</span>
-                    </div>
-                  </div>
-
-                  <Separator />
-
-                  <div>
-                    <div className="font-medium">Weekly Stay (7 nights)</div>
-                    <div className="flex justify-between">
-                      <span>Base Price (7 nights)</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * 7).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Weekly Discount (-10%)</span>
-                      <span>-${(parseFloat(pricingForm.basePrice) * 7 * 0.1).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Fees</span>
-                      <span>$75.00</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span>Taxes</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * 6.3 * parseFloat(pricingForm.taxRate) / 100).toFixed(2)}</span>
-                    </div>
-                    <div className="flex justify-between font-medium">
-                      <span>Total</span>
-                      <span>${(parseFloat(pricingForm.basePrice) * 6.3 + 75 + (parseFloat(pricingForm.basePrice) * 6.3 * parseFloat(pricingForm.taxRate) / 100)).toFixed(2)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <Button className="w-full bg-blue-600 hover:bg-blue-700">Save & Finalize Pricing</Button>
-            </CardContent>
-          </Card>
-        </div>
-      </div>
-    </div>
-  );
-
-  // Add navigation buttons for pricing step
-  const renderPricingNavigation = () => (
-    <div className="flex justify-between mt-6">
-      <Button 
-        variant="outline"
-        onClick={() => setCurrentStep(3)}
-      >
-        Previous: Availability
-      </Button>
-      <Button 
-        onClick={() => {
-          alert("Asset created successfully!");
-          setActiveTab("dashboard");
-          setCurrentStep(1);
-        }}
-        className="bg-blue-600 hover:bg-blue-700"
-      >
-        Save & Exit
-      </Button>
-    </div>
-  );
 
   const renderDashboard = () => (
     <div className="space-y-6">
@@ -1283,10 +904,67 @@ const AdminDashboard = () => {
       case "assets":
         return (
           <div className="space-y-6">
-            <h1 className="text-2xl font-bold">Assets</h1>
-            <div className="flex items-center justify-center h-64">
-              <p className="text-gray-500">Asset management content coming soon...</p>
+            <div className="flex items-center justify-between">
+              <h1 className="text-2xl font-bold">Assets</h1>
+              <Button
+                className="bg-blue-600 hover:bg-blue-700"
+                onClick={() => {
+                  resetAssetBuilder();
+                  setActiveTab("create-asset");
+                  setAssetManagementExpanded(true);
+                }}
+              >
+                <Plus className="h-4 w-4 mr-2" />
+                Add New Asset
+              </Button>
             </div>
+
+            {savedAssets.length === 0 ? (
+              <div className="flex items-center justify-center h-64">
+                <p className="text-gray-500">No assets yet. Click "Add New Asset" to create one.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {savedAssets.map(asset => (
+                  <Card key={asset.id} className="overflow-hidden hover:shadow-lg transition-shadow cursor-pointer" onClick={() => { setAssetToView(asset); setShowAssetDialog(true); }}>
+                    <div className="h-40 w-full bg-gray-100 flex items-center justify-center">
+                      <span className="text-xs text-gray-500">{asset.images.length ? 'Cover Image' : 'No image'}</span>
+                    </div>
+                    <CardHeader className="pb-2">
+                      <div className="flex items-start justify-between">
+                        <div>
+                          <CardTitle className="text-lg">{asset.name}</CardTitle>
+                          <CardDescription className="text-xs capitalize">{asset.type.replace('-', ' ')}</CardDescription>
+                        </div>
+                        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); handleEditAsset(asset.id); }}>
+                          <Edit className="h-4 w-4 mr-1" /> Edit
+                        </Button>
+                      </div>
+                    </CardHeader>
+                    <CardContent className="space-y-3">
+                      <div className="flex items-center justify-between text-sm">
+                        <div className="text-gray-700">
+                          <div><span className="font-medium">Location:</span> {asset.location || "—"}</div>
+                          <div><span className="font-medium">Capacity:</span> {asset.capacity || "—"}</div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-xl font-bold">{asset.basePrice ? `${asset.currency} ${asset.basePrice}` : "—"}</div>
+                          <div className="text-xs text-gray-500">per day</div>
+                        </div>
+                      </div>
+                      <div className="flex flex-wrap gap-1">
+                        {asset.amenities.slice(0, 4).map(a => (
+                          <Badge key={a} variant="secondary" className="text-xs">{a}</Badge>
+                        ))}
+                        {asset.amenities.length > 4 && (
+                          <Badge variant="outline" className="text-xs">+{asset.amenities.length - 4} more</Badge>
+                        )}
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            )}
           </div>
         );
       case "create-asset":
@@ -1301,33 +979,17 @@ const AdminDashboard = () => {
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
               </Button>
-              <h1 className="text-2xl font-bold">Create New Asset</h1>
+              <h1 className="text-2xl font-bold">{isEditing ? "Edit Asset" : "Create New Asset"}</h1>
             </div>
-            
-            {currentStep === 4 && (
-              <div className="mb-4">
-                <h2 className="text-lg font-medium text-gray-600">Asset Creation: Pricing & Details</h2>
-              </div>
-            )}
-            
             {renderStepIndicator()}
-            
             {currentStep === 1 && renderBasicInformation()}
             {currentStep === 2 && renderAmenities()}
             {currentStep === 3 && renderAvailability()}
-            {currentStep === 4 && (
-              <>
-                {renderPricing()}
-                {renderPricingNavigation()}
-              </>
-            )}
-            
-            {currentStep < 4 && (
+            {currentStep < 3 && (
               <div className="flex justify-between">
                 <Button 
                   variant="outline"
                   onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
-                  disabled={currentStep === 1}
                 >
                   Back
                 </Button>
@@ -1335,17 +997,30 @@ const AdminDashboard = () => {
                   <Button variant="outline">Save Draft</Button>
                   <Button 
                     onClick={() => {
-                      if (currentStep < 4) {
-                        setCurrentStep(currentStep + 1);
-                      } else {
-                        alert("Asset created successfully!");
-                        setActiveTab("assets");
-                        setCurrentStep(1);
-                      }
+                      setCurrentStep(currentStep + 1);
                     }}
                     className="bg-blue-600 hover:bg-blue-700"
                   >
-                    {currentStep < 4 ? "Save & Continue" : "Save & Exit"}
+                    Next
+                  </Button>
+                </div>
+              </div>
+            )}
+            {currentStep === 3 && (
+              <div className="flex justify-between">
+                <Button 
+                  variant="outline"
+                  onClick={() => setCurrentStep(Math.max(1, currentStep - 1))}
+                >
+                  Back
+                </Button>
+                <div className="space-x-2">
+                  <Button variant="outline">Save Draft</Button>
+                  <Button 
+                    onClick={handleSaveAsset}
+                    className="bg-blue-600 hover:bg-blue-700"
+                  >
+                    {isEditing ? "Update & Exit" : "Save & Exit"}
                   </Button>
                 </div>
               </div>
@@ -1364,7 +1039,7 @@ const AdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex">
       {/* Sidebar */}
-      <div className="w-64 bg-blue-600 text-white p-6">
+      <div className="w-64 bg-blue-600 text-white p-6 h-screen sticky top-0 overflow-hidden">
         <div className="flex items-center space-x-2 mb-8">
           <div className="w-8 h-8 bg-white rounded-md flex items-center justify-center">
             <span className="text-blue-600 font-bold text-lg">G</span>
@@ -1399,7 +1074,6 @@ const AdminDashboard = () => {
                     <ChevronRight className="h-4 w-4" />
                 )}
               </button>
-              
               {item.hasSubmenu && assetManagementExpanded && (
                 <div className="ml-4 mt-1 space-y-1">
                   {item.submenu?.map((subItem) => (
@@ -1416,6 +1090,7 @@ const AdminDashboard = () => {
                       <span className="text-xs">{subItem.label}</span>
                     </button>
                   ))}
+                  {/* Dynamic asset list under Assets submenu - intentionally hidden as requested */}
                 </div>
               )}
             </div>
@@ -1431,19 +1106,9 @@ const AdminDashboard = () => {
       </div>
 
       {/* Main Content */}
-      <div className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
-          <div></div>
+      <div className="flex-1 p-8 h-screen overflow-y-auto">
+        <div className="flex items-center justify-end mb-8">
           <div className="flex items-center space-x-4">
-            <Button 
-              className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => {
-                setActiveTab("create-asset");
-                setAssetManagementExpanded(true);
-              }}
-            >
-              New Asset
-            </Button>
             <div className="text-right">
               <p className="text-sm font-medium">Alex Morgan</p>
               <p className="text-xs text-gray-500">Admin Manager</p>
@@ -1455,6 +1120,141 @@ const AdminDashboard = () => {
         </div>
 
         {renderContent()}
+
+        {/* Asset Details Dialog */}
+        <Dialog open={showAssetDialog} onOpenChange={setShowAssetDialog}>
+          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+            {assetToView && (
+              <div className="space-y-4">
+                <div className="h-56 w-full bg-gray-100 rounded flex items-center justify-center">
+                  <span className="text-xs text-gray-500">{assetToView.images.length ? 'Image carousel here' : 'No image available'}</span>
+                </div>
+                <div className="flex items-start justify-between">
+                  <div>
+                    <DialogHeader>
+                      <DialogTitle className="text-xl">{assetToView.name}</DialogTitle>
+                      <DialogDescription className="capitalize">{assetToView.type.replace('-', ' ')}</DialogDescription>
+                    </DialogHeader>
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold">{assetToView.basePrice ? `${assetToView.currency} ${assetToView.basePrice}` : '—'}</div>
+                    <div className="text-xs text-gray-500">per day</div>
+                  </div>
+                </div>
+
+                <Separator />
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <div><span className="font-medium">Location:</span> {assetToView.location || '—'}</div>
+                    <div><span className="font-medium">Capacity:</span> {assetToView.capacity || '—'}</div>
+                  </div>
+                  <div>
+                    <div className="font-medium mb-1">Amenities</div>
+                    <div className="flex flex-wrap gap-1">
+                      {assetToView.amenities.map(a => (
+                        <Badge key={a} variant="secondary" className="text-xs">{a}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+
+                {assetToView.description && (
+                  <div>
+                    <div className="font-medium text-sm mb-1">Description</div>
+                    <p className="text-sm text-gray-700">{assetToView.description}</p>
+                  </div>
+                )}
+
+                {assetToView.slots.length > 0 && (
+                  <div>
+                    <div className="font-medium text-sm mb-1">Saved Availability Presets</div>
+                    <div className="flex flex-wrap gap-2">
+                      {assetToView.slots.map(s => (
+                        <Badge key={s.id} className="text-xs">{s.name} • {s.type === 'daily' ? 'Daily' : 'Hourly'}</Badge>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                <DialogFooter>
+                  <Button variant="outline" onClick={() => setShowAssetDialog(false)}>Close</Button>
+                  <Button onClick={() => { setShowAssetDialog(false); handleEditAsset(assetToView.id); }}>Edit</Button>
+                </DialogFooter>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
+
+        {/* Edit Asset Dialog with Section Tabs */}
+        <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
+          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+            <DialogHeader>
+              <DialogTitle className="text-xl">{isEditing ? 'Edit Asset' : 'Create Asset'}</DialogTitle>
+              <DialogDescription>Update the selected section and click Save below.</DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center gap-2 mb-4">
+              <Button variant={activeEditTab === 'basic' ? 'default' : 'outline'} size="sm" onClick={() => setActiveEditTab('basic')}>1. Basic Information</Button>
+              <Button variant={activeEditTab === 'amenities' ? 'default' : 'outline'} size="sm" onClick={() => setActiveEditTab('amenities')}>2. Amenities</Button>
+              <Button variant={activeEditTab === 'availability' ? 'default' : 'outline'} size="sm" onClick={() => setActiveEditTab('availability')}>3. Availability</Button>
+            </div>
+
+            <div className="space-y-4">
+              {activeEditTab === 'basic' && (
+                <div className="space-y-6">
+                  {renderBasicInformation()}
+                  <div className="flex justify-end">
+                    <Button onClick={() => {
+                      if (!editingAssetId) return;
+                      const updated = {
+                        id: editingAssetId,
+                        name: assetForm.name.trim(),
+                        type: assetForm.type,
+                        location: assetForm.location,
+                        capacity: assetForm.capacity,
+                        description: assetForm.description,
+                        basePrice: assetForm.basePrice,
+                        currency: assetForm.currency,
+                        amenities: selectedAmenities,
+                        images: uploadedImages,
+                        slots: savedSlots,
+                      };
+                      setSavedAssets(prev => prev.map(a => a.id === editingAssetId ? updated : a));
+                    }}>Save Basic Information</Button>
+                  </div>
+                </div>
+              )}
+
+              {activeEditTab === 'amenities' && (
+                <div className="space-y-6">
+                  {renderAmenities()}
+                  <div className="flex justify-end">
+                    <Button onClick={() => {
+                      if (!editingAssetId) return;
+                      setSavedAssets(prev => prev.map(a => a.id === editingAssetId ? { ...a, amenities: selectedAmenities } : a));
+                    }}>Save Amenities</Button>
+                  </div>
+                </div>
+              )}
+
+              {activeEditTab === 'availability' && (
+                <div className="space-y-6">
+                  {renderAvailability()}
+                  <div className="flex justify-end">
+                    <Button onClick={() => {
+                      if (!editingAssetId) return;
+                      setSavedAssets(prev => prev.map(a => a.id === editingAssetId ? { ...a, slots: savedSlots } : a));
+                    }}>Save Availability</Button>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowEditDialog(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       </div>
     </div>
   );
