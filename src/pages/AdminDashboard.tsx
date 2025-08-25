@@ -9,6 +9,7 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Calendar } from "@/components/ui/calendar";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { 
   LayoutDashboard, 
   Plus, 
@@ -25,7 +26,14 @@ import {
   Calendar as CalendarIcon,
   Upload,
   X,
-  ChevronLeft
+  ChevronLeft,
+  ChevronDown,
+  ChevronRight,
+  Clock,
+  Check,
+  Save,
+  Trash2,
+  Edit
 } from "lucide-react";
 
 const AdminDashboard = () => {
@@ -34,12 +42,28 @@ const AdminDashboard = () => {
   const [selectedAmenities, setSelectedAmenities] = useState<string[]>([]);
   const [uploadedImages, setUploadedImages] = useState<File[]>([]);
   const [availabilityMode, setAvailabilityMode] = useState("daily");
+  const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
+  const [selectedDailySlot, setSelectedDailySlot] = useState<string>("");
+  const [savedSlots, setSavedSlots] = useState<Array<{
+    id: string;
+    name: string;
+    date: Date;
+    slots: string[];
+    type: 'daily' | 'hourly';
+    hoursCount: number;
+  }>>([]);
+  const [showNameDialog, setShowNameDialog] = useState(false);
+  const [slotName, setSlotName] = useState("");
+  const [assetManagementExpanded, setAssetManagementExpanded] = useState(false);
   const [assetForm, setAssetForm] = useState({
     name: "",
     type: "",
     location: "",
     capacity: "",
     description: "",
+    basePrice: "",
+    currency: "USD",
   });
   const [pricingForm, setPricingForm] = useState({
     basePrice: "150.00",
@@ -52,8 +76,16 @@ const AdminDashboard = () => {
 
   const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
-    { id: "create-asset", label: "Create New Asset", icon: Plus },
-    { id: "asset-management", label: "Asset Management", icon: Settings },
+    { 
+      id: "asset-management", 
+      label: "Asset Management", 
+      icon: Settings,
+      hasSubmenu: true,
+      submenu: [
+        { id: "assets", label: "Assets", icon: Settings },
+        { id: "create-asset", label: "Create New Asset", icon: Plus }
+      ]
+    },
     { id: "availability", label: "Availability", icon: CalendarIcon },
     { id: "pricing", label: "Pricing & Details", icon: BarChart3 },
     { id: "amenities", label: "Amenities", icon: Wifi },
@@ -189,6 +221,38 @@ const AdminDashboard = () => {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
+            <Label htmlFor="base-price">Base Price *</Label>
+            <Input
+              id="base-price"
+              type="number"
+              placeholder="Enter base price"
+              value={assetForm.basePrice}
+              onChange={(e) => setAssetForm(prev => ({ ...prev, basePrice: e.target.value }))}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="currency">Currency *</Label>
+            <Select 
+              value={assetForm.currency} 
+              onValueChange={(value) => setAssetForm(prev => ({ ...prev, currency: value }))}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select currency" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="USD">USD - US Dollar</SelectItem>
+                <SelectItem value="EUR">EUR - Euro</SelectItem>
+                <SelectItem value="GBP">GBP - British Pound</SelectItem>
+                <SelectItem value="INR">INR - Indian Rupee</SelectItem>
+                <SelectItem value="CAD">CAD - Canadian Dollar</SelectItem>
+                <SelectItem value="AUD">AUD - Australian Dollar</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
             <Label htmlFor="description">Description</Label>
             <Textarea
               id="description"
@@ -249,13 +313,6 @@ const AdminDashboard = () => {
             <p className="text-xs text-gray-500 mt-2">Set any one image as cover picture and you can delete the image if not needed</p>
           </div>
         )}
-
-        <div className="bg-green-50 border border-green-200 rounded-lg p-3">
-          <div className="flex items-center space-x-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm font-medium text-green-700">Changes saved successfully</span>
-          </div>
-        </div>
       </CardContent>
     </Card>
   );
@@ -294,228 +351,394 @@ const AdminDashboard = () => {
             <Button variant="outline" size="sm">Add</Button>
           </div>
         </div>
-
-        <div>
-          <h3 className="text-lg font-medium mb-4">Selected Amenities</h3>
-          <p className="text-sm text-gray-600 mb-3">These amenities will be displayed on the asset listing</p>
-          <div className="flex flex-wrap gap-2">
-            {selectedAmenities.map((amenityId) => {
-              const amenity = commonAmenities.find(a => a.id === amenityId);
-              return amenity ? (
-                <Badge key={amenityId} variant="secondary" className="flex items-center space-x-1">
-                  <amenity.icon className="h-3 w-3" />
-                  <span>{amenity.label}</span>
-                </Badge>
-              ) : null;
-            })}
-            {selectedAmenities.includes('wifi') && <Badge variant="secondary">Coffee Machine</Badge>}
-          </div>
-        </div>
-
-        <div>
-          <h3 className="text-lg font-medium mb-4">Asset Preview</h3>
-          <Card className="w-full max-w-sm">
-            <div className="relative">
-              <img 
-                src="/placeholder.svg" 
-                alt="Conference Room A"
-                className="w-full h-32 object-cover rounded-t-lg"
-              />
-            </div>
-            <CardContent className="p-4">
-              <h4 className="font-medium text-lg">Conference Room A</h4>
-              <p className="text-sm text-gray-600 mb-2">Large conference room with modern amenities</p>
-              <div className="flex items-center text-xs text-gray-500 mb-2">
-                <span>Type: Coworking</span>
-              </div>
-              <div className="flex items-center text-xs text-gray-500 mb-2">
-                <span>Floor: 3, North Wing</span>
-              </div>
-              <div className="flex items-center text-xs text-gray-500 mb-3">
-                <span>Capacity: 12 people</span>
-              </div>
-              <div className="flex flex-wrap gap-1">
-                {selectedAmenities.slice(0, 5).map((amenityId) => {
-                  const amenity = commonAmenities.find(a => a.id === amenityId);
-                  return amenity ? (
-                    <Badge key={amenityId} variant="outline" className="text-xs">
-                      {amenity.label}
-                    </Badge>
-                  ) : null;
-                })}
-                <Badge variant="outline" className="text-xs">Coffee Machine</Badge>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
       </CardContent>
     </Card>
   );
 
-  const renderAvailability = () => (
-    <Card>
-      <CardHeader>
-        <CardTitle>Asset Availability Settings</CardTitle>
-        <CardDescription>Define when your asset is available for booking</CardDescription>
-      </CardHeader>
-      <CardContent className="space-y-6">
-        <div>
-          <h3 className="text-lg font-medium mb-4">Weekly Availability Template</h3>
-          <div className="flex space-x-2 mb-6">
-            <Button 
-              variant={availabilityMode === "monthly" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setAvailabilityMode("monthly")}
-            >
-              Monthly
-            </Button>
-            <Button 
-              variant={availabilityMode === "weekly" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setAvailabilityMode("weekly")}
-            >
-              Weekly
-            </Button>
-            <Button 
-              variant={availabilityMode === "daily" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setAvailabilityMode("daily")}
-            >
-              Daily
-            </Button>
-            <Button 
-              variant={availabilityMode === "hourly" ? "default" : "outline"} 
-              size="sm"
-              onClick={() => setAvailabilityMode("hourly")}
-            >
-              Hourly
-            </Button>
-          </div>
+  const renderAvailability = () => {
+    // Generate time slots (hourly from 9 AM to 6 PM)
+    const generateTimeSlots = () => {
+      const slots = [];
+      for (let hour = 9; hour <= 18; hour++) {
+        const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
+        const timeValue = `${hour}:00`;
+        slots.push({ value: timeValue, label: time12 });
+      }
+      return slots;
+    };
 
-          <div className="space-y-3">
-            {['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'].map((day) => (
-              <div key={day} className="flex items-center space-x-4 p-4 border rounded-lg">
-                <div className="flex items-center space-x-2">
-                  <Checkbox id={`${day.toLowerCase()}-enabled`} defaultChecked={day !== 'Saturday' && day !== 'Sunday'} />
-                  <div className="w-20">
-                    <span className="font-medium">{day}</span>
+    const timeSlots = generateTimeSlots();
+
+    const toggleTimeSlot = (timeValue: string) => {
+      setSelectedTimeSlots(prev => 
+        prev.includes(timeValue)
+          ? prev.filter(slot => slot !== timeValue)
+          : [...prev, timeValue].sort()
+      );
+    };
+
+    const calculateSelectedHours = () => {
+      if (availabilityMode === "daily") {
+        // For daily mode, calculate based on selected daily slot
+        switch (selectedDailySlot) {
+          case "morning": return 3;
+          case "afternoon": return 6;
+          case "fullday": return 9;
+          default: return 0;
+        }
+      } else {
+        // For hourly mode, use the length of selected time slots
+        return selectedTimeSlots.length;
+      }
+    };
+
+    const saveSlot = () => {
+      if (!selectedDate) {
+        alert('Please select a date before saving.');
+        return;
+      }
+      
+      if (availabilityMode === "daily" && !selectedDailySlot) {
+        alert('Please select a daily slot before saving.');
+        return;
+      }
+      
+      if (availabilityMode === "hourly" && selectedTimeSlots.length === 0) {
+        alert('Please select at least one time slot before saving.');
+        return;
+      }
+      
+      setShowNameDialog(true);
+    };
+
+    const confirmSaveSlot = () => {
+      if (!slotName.trim()) {
+        alert('Please enter a name for the slot configuration.');
+        return;
+      }
+
+      const newSlot = {
+        id: Date.now().toString(),
+        name: slotName.trim(),
+        date: selectedDate!,
+        slots: [...selectedTimeSlots],
+        type: availabilityMode as 'daily' | 'hourly',
+        hoursCount: calculateSelectedHours()
+      };
+
+      setSavedSlots(prev => [...prev, newSlot]);
+      setSelectedTimeSlots([]);
+      setSlotName("");
+      setShowNameDialog(false);
+      alert('Slot configuration saved successfully!');
+    };
+
+    const cancelSaveSlot = () => {
+      setSlotName("");
+      setShowNameDialog(false);
+    };
+
+    const deleteSlot = (slotId: string) => {
+      if (confirm('Are you sure you want to delete this slot configuration?')) {
+        setSavedSlots(prev => prev.filter(slot => slot.id !== slotId));
+      }
+    };
+
+    const loadSlot = (slot: typeof savedSlots[0]) => {
+      setSelectedDate(slot.date);
+      setSelectedTimeSlots(slot.slots);
+      setAvailabilityMode(slot.type);
+      
+      // If it's a daily slot, determine which daily slot was selected based on the time slots
+      if (slot.type === 'daily') {
+        if (slot.slots.length === 3 && slot.slots.includes("9:00")) {
+          setSelectedDailySlot("morning");
+        } else if (slot.slots.length === 6 && slot.slots.includes("12:00") && slot.slots.includes("17:00")) {
+          setSelectedDailySlot("afternoon");
+        } else if (slot.slots.length >= 9) {
+          setSelectedDailySlot("fullday");
+        }
+      } else {
+        setSelectedDailySlot("");
+      }
+    };
+
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Asset Availability Settings</CardTitle>
+          <CardDescription>Define when your asset is available for booking</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          {/* Availability Mode Selector */}
+          <div>
+            <div className="flex space-x-2 mb-6">
+              <Button 
+                variant={availabilityMode === "daily" ? "default" : "outline"} 
+                size="sm"
+                onClick={() => {
+                  setAvailabilityMode("daily");
+                  setSelectedTimeSlots([]);
+                  setSelectedDailySlot("");
+                }}
+              >
+                Daily Slots
+              </Button>
+              <Button 
+                variant={availabilityMode === "hourly" ? "default" : "outline"} 
+                size="sm"
+                onClick={() => {
+                  setAvailabilityMode("hourly");
+                  setSelectedTimeSlots([]);
+                  setSelectedDailySlot("");
+                }}
+              >
+                Hourly Slots
+              </Button>
+            </div>
+
+            {/* Daily/Hourly Slot Interface */}
+            <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+              {/* Calendar Section */}
+              <div className="lg:col-span-1">
+                <h3 className="text-lg font-medium mb-4">Select Date</h3>
+                <Calendar
+                  mode="single"
+                  selected={selectedDate}
+                  onSelect={setSelectedDate}
+                  className="rounded-md border"
+                />
+              </div>
+
+              {/* Time Slots Section */}
+              <div className="lg:col-span-2">
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-lg font-medium">Available Time Slots</h3>
+                  <div className="flex items-center space-x-2 bg-blue-50 px-3 py-2 rounded-lg">
+                    <Clock className="h-4 w-4 text-blue-600" />
+                    <span className="text-sm font-medium text-blue-600">
+                      {calculateSelectedHours()} {calculateSelectedHours() === 1 ? 'hour' : 'hours'} selected
+                    </span>
                   </div>
                 </div>
-                <div className="flex items-center space-x-2">
-                  <Label>From:</Label>
-                  <Select defaultValue="9:00 AM">
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="8:00 AM">8:00 AM</SelectItem>
-                      <SelectItem value="9:00 AM">9:00 AM</SelectItem>
-                      <SelectItem value="10:00 AM">10:00 AM</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Label>To:</Label>
-                  <Select defaultValue="4:00 PM">
-                    <SelectTrigger className="w-32">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="4:00 PM">4:00 PM</SelectItem>
-                      <SelectItem value="5:00 PM">5:00 PM</SelectItem>
-                      <SelectItem value="6:00 PM">6:00 PM</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <div>
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-medium">Calendar Exceptions</h3>
-              <div className="flex space-x-2">
-                <Button variant="outline" size="sm">Back</Button>
-                <Button variant="default" size="sm">Save & Continue</Button>
-              </div>
-            </div>
-            <p className="text-sm text-gray-600 mb-4">Set custom availability for specific dates or date ranges</p>
-            
-            <div className="space-y-4">
-              <div>
-                <Label className="text-sm font-medium">October 2025</Label>
-                <div className="grid grid-cols-7 gap-1 mt-2 text-center text-xs">
-                  <div className="font-medium p-2">Sun</div>
-                  <div className="font-medium p-2">Mon</div>
-                  <div className="font-medium p-2">Tue</div>
-                  <div className="font-medium p-2">Wed</div>
-                  <div className="font-medium p-2">Thu</div>
-                  <div className="font-medium p-2">Fri</div>
-                  <div className="font-medium p-2">Sat</div>
-                  
-                  {/* Calendar Days */}
-                  {Array.from({ length: 31 }, (_, i) => {
-                    const day = i + 1;
-                    const isSpecialDay = [10, 15, 16].includes(day);
-                    return (
-                      <div 
-                        key={day} 
-                        className={`p-2 rounded cursor-pointer ${
-                          isSpecialDay 
-                            ? 'bg-blue-100 text-blue-600' 
-                            : 'hover:bg-gray-100'
+                {availabilityMode === "daily" ? (
+                  /* Daily Slots - Full Day Options */
+                  <div className="space-y-3">
+                    <div className="grid grid-cols-1 gap-3">
+                      {[
+                        { value: "morning", label: "Morning (9:00 AM - 12:00 PM)", hours: "3 hours", slots: ["9:00", "10:00", "11:00"] },
+                        { value: "afternoon", label: "Afternoon (12:00 PM - 6:00 PM)", hours: "6 hours", slots: ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
+                        { value: "fullday", label: "Full Day (9:00 AM - 6:00 PM)", hours: "9 hours", slots: timeSlots.map(s => s.value) }
+                      ].map((slot) => (
+                        <div
+                          key={slot.value}
+                          onClick={() => {
+                            setSelectedDailySlot(slot.value);
+                            setSelectedTimeSlots(slot.slots);
+                          }}
+                          className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                            selectedDailySlot === slot.value
+                              ? 'border-blue-500 bg-blue-50'
+                              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                          }`}
+                        >
+                          <div>
+                            <h4 className={`font-medium ${
+                              selectedDailySlot === slot.value ? 'text-blue-900' : 'text-gray-900'
+                            }`}>{slot.label}</h4>
+                            <p className={`text-sm ${
+                              selectedDailySlot === slot.value ? 'text-blue-700' : 'text-gray-500'
+                            }`}>{slot.hours}</p>
+                          </div>
+                          <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center transition-all ${
+                            selectedDailySlot === slot.value
+                              ? 'border-blue-500 bg-blue-500'
+                              : 'border-gray-300'
+                          }`}>
+                            {selectedDailySlot === slot.value && (
+                              <div className="w-2 h-2 bg-white rounded-full"></div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ) : (
+                  /* Hourly Slots - Individual Hour Selection */
+                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
+                    {timeSlots.map((slot) => (
+                      <button
+                        key={slot.value}
+                        onClick={() => toggleTimeSlot(slot.value)}
+                        className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
+                          selectedTimeSlots.includes(slot.value)
+                            ? 'border-blue-500 bg-blue-500 text-white'
+                            : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50'
                         }`}
                       >
-                        {day}
+                        {selectedTimeSlots.includes(slot.value) && (
+                          <Check className="h-3 w-3 mx-auto mb-1" />
+                        )}
+                        {slot.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+
+                {/* Save Slot Button */}
+                <div className="mt-6 flex justify-center">
+                  <Button
+                    onClick={saveSlot}
+                    disabled={
+                      !selectedDate || 
+                      (availabilityMode === "daily" && !selectedDailySlot) ||
+                      (availabilityMode === "hourly" && selectedTimeSlots.length === 0)
+                    }
+                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+                  >
+                    <Save className="h-4 w-4 mr-2" />
+                    Save Slot Configuration
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Saved Slots Display */}
+          {savedSlots.length > 0 && (
+            <div>
+              <h3 className="text-lg font-medium mb-4">Saved Slot Configurations</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {savedSlots.map((slot) => (
+                  <Card key={slot.id} className="p-4">
+                    <div className="flex items-start justify-between mb-3">
+                      <div>
+                        <h4 className="font-medium text-gray-900">{slot.name}</h4>
+                        <p className="text-sm text-gray-500">
+                          {slot.date.toLocaleDateString()} • {slot.type === 'daily' ? 'Daily' : 'Hourly'} Mode
+                        </p>
                       </div>
-                    );
-                  })}
-                </div>
+                      <div className="flex space-x-1">
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => loadSlot(slot)}
+                          className="h-8 w-8 p-0"
+                        >
+                          <Edit className="h-3 w-3" />
+                        </Button>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => deleteSlot(slot.id)}
+                          className="h-8 w-8 p-0 text-red-600 hover:text-red-700"
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
+                      </div>
+                    </div>
+                    <div className="flex items-center space-x-2 text-sm">
+                      <Clock className="h-4 w-4 text-blue-600" />
+                      <span className="text-blue-600 font-medium">
+                        {slot.hoursCount} {slot.hoursCount === 1 ? 'hour' : 'hours'}
+                      </span>
+                    </div>
+                    <div className="mt-2 text-xs text-gray-500">
+                      {slot.slots.length > 0 && (
+                        <span>
+                          {slot.slots.slice(0, 3).map(timeValue => {
+                            const timeSlot = timeSlots.find(ts => ts.value === timeValue);
+                            return timeSlot?.label;
+                          }).join(', ')}
+                          {slot.slots.length > 3 && ` +${slot.slots.length - 3} more`}
+                        </span>
+                      )}
+                    </div>
+                  </Card>
+                ))}
               </div>
+            </div>
+          )}
 
-              <div className="pt-4 border-t">
-                <div className="flex items-center space-x-4">
-                  <Checkbox id="custom-hours" />
-                  <Label htmlFor="custom-hours" className="text-sm">Custom Hours</Label>
-                  <Checkbox id="unavailable-blackout" />
-                  <Label htmlFor="unavailable-blackout" className="text-sm">Unavailable (blackout)</Label>
-                </div>
-              </div>
+          {/* Quick Actions */}
+          <div className="flex items-center justify-between pt-4 border-t">
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  setSelectedTimeSlots([]);
+                  setSelectedDailySlot("");
+                }}
+              >
+                Clear All
+              </Button>
+              <Button 
+                variant="outline" 
+                size="sm"
+                onClick={() => {
+                  if (availabilityMode === "daily") {
+                    setSelectedDailySlot("fullday");
+                    setSelectedTimeSlots(timeSlots.map(s => s.value));
+                  } else {
+                    setSelectedTimeSlots(timeSlots.map(s => s.value));
+                  }
+                }}
+              >
+                Select All
+              </Button>
+            </div>
+            <div className="text-sm text-gray-500">
+              {selectedDate?.toLocaleDateString()} • {calculateSelectedHours()} hours selected • {savedSlots.length} saved configurations
             </div>
           </div>
 
-          <div>
-            <h3 className="text-lg font-medium mb-4">November</h3>
-            <div className="grid grid-cols-7 gap-1 mt-2 text-center text-xs">
-              <div className="font-medium p-2">Sun</div>
-              <div className="font-medium p-2">Mon</div>
-              <div className="font-medium p-2">Tue</div>
-              <div className="font-medium p-2">Wed</div>
-              <div className="font-medium p-2">Thu</div>
-              <div className="font-medium p-2">Fri</div>
-              <div className="font-medium p-2">Sat</div>
-              
-              {Array.from({ length: 30 }, (_, i) => (
-                <div key={i + 1} className="p-2 rounded hover:bg-gray-100 cursor-pointer">
-                  {i + 1}
+          {/* Save Slot Name Dialog */}
+          <Dialog open={showNameDialog} onOpenChange={setShowNameDialog}>
+            <DialogContent className="sm:max-w-[425px]">
+              <DialogHeader>
+                <DialogTitle>Save Slot Configuration</DialogTitle>
+                <DialogDescription>
+                  Enter a name for this slot configuration. This will help you identify it later.
+                </DialogDescription>
+              </DialogHeader>
+              <div className="grid gap-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="slot-name">Configuration Name</Label>
+                  <Input
+                    id="slot-name"
+                    placeholder="e.g., Morning Shift, Weekend Hours, etc."
+                    value={slotName}
+                    onChange={(e) => setSlotName(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        confirmSaveSlot();
+                      }
+                    }}
+                  />
                 </div>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        <div className="text-center py-4">
-          <p className="text-sm text-gray-500">Changes are saved automatically</p>
-          <div className="flex items-center justify-center space-x-2 mt-2">
-            <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-            <span className="text-sm text-green-600">All changes saved</span>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  );
+                <div className="text-sm text-gray-500">
+                  <p><strong>Date:</strong> {selectedDate?.toLocaleDateString()}</p>
+                  <p><strong>Mode:</strong> {availabilityMode === 'daily' ? 'Daily Slots' : 'Hourly Slots'}</p>
+                  <p><strong>Hours:</strong> {calculateSelectedHours()} {calculateSelectedHours() === 1 ? 'hour' : 'hours'} selected</p>
+                </div>
+              </div>
+              <DialogFooter>
+                <Button variant="outline" onClick={cancelSaveSlot}>
+                  Cancel
+                </Button>
+                <Button onClick={confirmSaveSlot} disabled={!slotName.trim()}>
+                  <Save className="h-4 w-4 mr-2" />
+                  Save Configuration
+                </Button>
+              </DialogFooter>
+            </DialogContent>
+          </Dialog>
+        </CardContent>
+      </Card>
+    );
+  };
 
   const renderPricing = () => (
     <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -1046,36 +1269,10 @@ const AdminDashboard = () => {
           </CardContent>
         </Card>
 
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-gray-600">Revenue</p>
-                <p className="text-2xl font-bold">$12,450</p>
-              </div>
-              <BarChart3 className="h-8 w-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
+
       </div>
 
-      <div className="grid grid-cols-2 gap-4">
-        <Button 
-          className="h-20 flex flex-col items-center justify-center space-y-2"
-          onClick={() => setActiveTab("create-asset")}
-        >
-          <Plus className="h-6 w-6" />
-          <span>Create Asset</span>
-        </Button>
-        <Button 
-          variant="outline" 
-          className="h-20 flex flex-col items-center justify-center space-y-2"
-          onClick={() => setActiveTab("availability")}
-        >
-          <CalendarIcon className="h-6 w-6" />
-          <span>Manage Schedule</span>
-        </Button>
-      </div>
+
     </div>
   );
 
@@ -1083,6 +1280,15 @@ const AdminDashboard = () => {
     switch (activeTab) {
       case "dashboard":
         return renderDashboard();
+      case "assets":
+        return (
+          <div className="space-y-6">
+            <h1 className="text-2xl font-bold">Assets</h1>
+            <div className="flex items-center justify-center h-64">
+              <p className="text-gray-500">Asset management content coming soon...</p>
+            </div>
+          </div>
+        );
       case "create-asset":
         return (
           <div className="space-y-6">
@@ -1090,7 +1296,7 @@ const AdminDashboard = () => {
               <Button 
                 variant="ghost" 
                 size="sm"
-                onClick={() => setActiveTab("dashboard")}
+                onClick={() => setActiveTab("assets")}
               >
                 <ChevronLeft className="h-4 w-4 mr-1" />
                 Back
@@ -1133,7 +1339,7 @@ const AdminDashboard = () => {
                         setCurrentStep(currentStep + 1);
                       } else {
                         alert("Asset created successfully!");
-                        setActiveTab("dashboard");
+                        setActiveTab("assets");
                         setCurrentStep(1);
                       }
                     }}
@@ -1168,18 +1374,51 @@ const AdminDashboard = () => {
 
         <nav className="space-y-2">
           {sidebarItems.map((item) => (
-            <button
-              key={item.id}
-              onClick={() => setActiveTab(item.id)}
-              className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
-                activeTab === item.id 
-                  ? 'bg-blue-700 text-white' 
-                  : 'text-blue-100 hover:bg-blue-700 hover:text-white'
-              }`}
-            >
-              <item.icon className="h-5 w-5" />
-              <span className="text-sm">{item.label}</span>
-            </button>
+            <div key={item.id}>
+              <button
+                onClick={() => {
+                  if (item.hasSubmenu) {
+                    setAssetManagementExpanded(!assetManagementExpanded);
+                  } else {
+                    setActiveTab(item.id);
+                  }
+                }}
+                className={`w-full flex items-center justify-between px-3 py-2 rounded-lg text-left transition-colors ${
+                  activeTab === item.id || (item.hasSubmenu && (activeTab === 'assets' || activeTab === 'create-asset'))
+                    ? 'bg-blue-700 text-white' 
+                    : 'text-blue-100 hover:bg-blue-700 hover:text-white'
+                }`}
+              >
+                <div className="flex items-center space-x-3">
+                  <item.icon className="h-5 w-5" />
+                  <span className="text-sm">{item.label}</span>
+                </div>
+                {item.hasSubmenu && (
+                  assetManagementExpanded ? 
+                    <ChevronDown className="h-4 w-4" /> : 
+                    <ChevronRight className="h-4 w-4" />
+                )}
+              </button>
+              
+              {item.hasSubmenu && assetManagementExpanded && (
+                <div className="ml-4 mt-1 space-y-1">
+                  {item.submenu?.map((subItem) => (
+                    <button
+                      key={subItem.id}
+                      onClick={() => setActiveTab(subItem.id)}
+                      className={`w-full flex items-center space-x-3 px-3 py-2 rounded-lg text-left transition-colors ${
+                        activeTab === subItem.id 
+                          ? 'bg-blue-800 text-white' 
+                          : 'text-blue-100 hover:bg-blue-700 hover:text-white'
+                      }`}
+                    >
+                      <subItem.icon className="h-4 w-4" />
+                      <span className="text-xs">{subItem.label}</span>
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
           ))}
         </nav>
 
@@ -1198,7 +1437,10 @@ const AdminDashboard = () => {
           <div className="flex items-center space-x-4">
             <Button 
               className="bg-blue-600 hover:bg-blue-700"
-              onClick={() => setActiveTab("create-asset")}
+              onClick={() => {
+                setActiveTab("create-asset");
+                setAssetManagementExpanded(true);
+              }}
             >
               New Asset
             </Button>
