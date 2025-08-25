@@ -148,7 +148,7 @@ const Index = () => {
                 <SelectContent>
                   <SelectItem value="wifi">WiFi</SelectItem>
                   <SelectItem value="projector">Projector</SelectItem>
-                  <SelectItem value="whiteboard">Whiteboard</SelectItem>
+                  {/* <SelectItem value="whiteboard">Whiteboard</SelectItem> */}
                 </SelectContent>
               </Select>
             </div>
