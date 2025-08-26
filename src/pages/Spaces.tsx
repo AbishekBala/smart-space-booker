@@ -11,11 +11,7 @@ import SpaceCard from "@/components/SpaceCard";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { 
   Filter, 
-  Search, 
-  MapPin, 
-  SlidersHorizontal,
-  Grid3X3,
-  List
+  Search
 } from "lucide-react";
 import coworkingImage from "@/assets/coworking-space.jpg";
 import privateOfficeImage from "@/assets/private-office.jpg";
@@ -27,17 +23,14 @@ const Spaces = () => {
   useScrollToTop();
   
   const navigate = useNavigate();
-  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
-  const [priceRange, setPriceRange] = useState([0, 200]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [priceRange] = useState([0, 200]);
   const [spaceType, setSpaceType] = useState("");
-  const [location, setLocation] = useState("");
   const [capacity, setCapacity] = useState("");
 
   const allSpaces = [
     {
       id: "1",
-      name: "Executive Office Suite",
+      name: "Private Office",
       type: "Private Office",
       image: privateOfficeImage,
       location: "Downtown Financial District",
@@ -50,7 +43,7 @@ const Spaces = () => {
     },
     {
       id: "2",
-      name: "Conference Room A",
+      name: "Meeting Room",
       type: "Meeting Room",
       image: meetingRoomImage,
       location: "Tech District",
@@ -63,7 +56,7 @@ const Spaces = () => {
     },
     {
       id: "3",
-      name: "Coworking Hotdesk",
+      name: "Coworking Space",
       type: "Coworking",
       image: coworkingImage,
       location: "Creative Quarter",
@@ -76,7 +69,7 @@ const Spaces = () => {
     },
     {
       id: "4",
-      name: "Innovation Lab",
+      name: "Meeting Room",
       type: "Meeting Room",
       image: meetingRoomImage,
       location: "Innovation Hub",
@@ -89,7 +82,7 @@ const Spaces = () => {
     },
     {
       id: "5",
-      name: "Creative Studio",
+      name: "Private Office",
       type: "Private Office",
       image: privateOfficeImage,
       location: "Arts District",
@@ -102,7 +95,7 @@ const Spaces = () => {
     },
     {
       id: "6",
-      name: "Open Desk Area",
+      name: "Coworking Space",
       type: "Coworking",
       image: coworkingImage,
       location: "Business Park",
@@ -116,14 +109,11 @@ const Spaces = () => {
   ];
 
   const filteredSpaces = allSpaces.filter(space => {
-    const matchesSearch = space.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         space.location.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesType = spaceType === "all-types" || !spaceType || space.type === spaceType;
-    const matchesLocation = !location || space.location.toLowerCase().includes(location.toLowerCase());
     const matchesCapacity = capacity === "any-size" || !capacity || space.capacity >= parseInt(capacity);
     const matchesPrice = space.price >= priceRange[0] && space.price <= priceRange[1];
 
-    return matchesSearch && matchesType && matchesLocation && matchesCapacity && matchesPrice;
+    return matchesType && matchesCapacity && matchesPrice;
   });
 
   return (
@@ -143,40 +133,39 @@ const Spaces = () => {
           {/* Search Bar */}
           <Card className="max-w-4xl mx-auto">
             <CardContent className="p-6">
-              <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
-                <div className="relative md:col-span-2">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                  <Input 
-                    placeholder="Search spaces, locations..." 
-                    className="pl-10"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                  />
+              <div className="flex flex-col sm:flex-row gap-4 w-full">
+                <div className="flex-1 grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <Select value={spaceType} onValueChange={setSpaceType}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Space Type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all-types">All Types</SelectItem>
+                      <SelectItem value="Private Office">Private Office</SelectItem>
+                      <SelectItem value="Coworking">Coworking</SelectItem>
+                      <SelectItem value="Meeting Room">Meeting Room</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <Select value={capacity} onValueChange={setCapacity}>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Capacity" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="any-size">Any Size</SelectItem>
+                      <SelectItem value="1">1+ People</SelectItem>
+                      <SelectItem value="4">4+ People</SelectItem>
+                      <SelectItem value="8">8+ People</SelectItem>
+                      <SelectItem value="12">12+ People</SelectItem>
+                    </SelectContent>
+                  </Select>
                 </div>
-                <Select value={spaceType} onValueChange={setSpaceType}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Space Type" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all-types">All Types</SelectItem>
-                    <SelectItem value="Private Office">Private Office</SelectItem>
-                    <SelectItem value="Coworking">Coworking</SelectItem>
-                    <SelectItem value="Meeting Room">Meeting Room</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Select value={capacity} onValueChange={setCapacity}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Capacity" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="any-size">Any Size</SelectItem>
-                    <SelectItem value="1">1+ People</SelectItem>
-                    <SelectItem value="4">4+ People</SelectItem>
-                    <SelectItem value="8">8+ People</SelectItem>
-                    <SelectItem value="12">12+ People</SelectItem>
-                  </SelectContent>
-                </Select>
-                <Button>
+                <Button 
+                  className="w-full sm:w-auto"
+                  onClick={() => {
+                    // Search functionality is handled by the filteredSpaces array
+                    // The button is just for visual consistency
+                  }}
+                >
                   <Search className="h-4 w-4 mr-2" />
                   Search
                 </Button>
@@ -187,79 +176,9 @@ const Spaces = () => {
       </section>
 
       <div className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-4 gap-8">
-          {/* Filters Sidebar */}
-          <div className="lg:col-span-1">
-            <Card className="sticky top-8">
-              <CardContent className="p-6">
-                <div className="flex items-center mb-6">
-                  <SlidersHorizontal className="h-5 w-5 mr-2" />
-                  <h3 className="font-semibold">Filter Options</h3>
-                </div>
-                
-                <div className="space-y-6">
-                  {/* Location */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Location</label>
-                    <div className="relative">
-                      <MapPin className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground h-4 w-4" />
-                      <Input 
-                        placeholder="Enter location" 
-                        className="pl-10"
-                        value={location}
-                        onChange={(e) => setLocation(e.target.value)}
-                      />
-                    </div>
-                  </div>
-                  
-                  {/* Price Range */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">
-                      Price Range: ${priceRange[0]} - ${priceRange[1]}/day
-                    </label>
-                    <Slider
-                      value={priceRange}
-                      onValueChange={setPriceRange}
-                      max={200}
-                      min={0}
-                      step={5}
-                      className="mt-2"
-                    />
-                  </div>
-                  
-                  {/* Amenities */}
-                  <div>
-                    <label className="text-sm font-medium mb-2 block">Amenities</label>
-                    <div className="space-y-2">
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="wifi" className="rounded" />
-                        <label htmlFor="wifi" className="text-sm">High-speed WiFi</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="coffee" className="rounded" />
-                        <label htmlFor="coffee" className="text-sm">Coffee & Refreshments</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="parking" className="rounded" />
-                        <label htmlFor="parking" className="text-sm">Parking</label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <input type="checkbox" id="printing" className="rounded" />
-                        <label htmlFor="printing" className="text-sm">Printing Services</label>
-                      </div>
-                    </div>
-                  </div>
-                  
-                  <Button variant="outline" className="w-full">
-                    Reset Filters
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-          </div>
-          
+        <div>
           {/* Results */}
-          <div className="lg:col-span-3">
+          <div>
             {/* Results Header */}
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <div>
@@ -269,45 +188,21 @@ const Spaces = () => {
                 </p>
               </div>
               
-              <div className="flex items-center space-x-4">
-                <Select defaultValue="recommended">
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="recommended">Recommended</SelectItem>
-                    <SelectItem value="price-low">Price: Low to High</SelectItem>
-                    <SelectItem value="price-high">Price: High to Low</SelectItem>
-                    <SelectItem value="rating">Highest Rated</SelectItem>
-                  </SelectContent>
-                </Select>
-                
-                <div className="flex border rounded-md">
-                  <Button
-                    variant={viewMode === 'grid' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('grid')}
-                    className="rounded-r-none"
-                  >
-                    <Grid3X3 className="h-4 w-4" />
-                  </Button>
-                  <Button
-                    variant={viewMode === 'list' ? 'default' : 'ghost'}
-                    size="sm"
-                    onClick={() => setViewMode('list')}
-                    className="rounded-l-none"
-                  >
-                    <List className="h-4 w-4" />
-                  </Button>
-                </div>
-              </div>
+              <Select defaultValue="recommended">
+                <SelectTrigger className="w-40">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recommended">Recommended</SelectItem>
+                  <SelectItem value="price-low">Price: Low to High</SelectItem>
+                  <SelectItem value="price-high">Price: High to Low</SelectItem>
+                  <SelectItem value="rating">Highest Rated</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
             
             {/* Results Grid */}
-            <div className={viewMode === 'grid' 
-              ? "grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6" 
-              : "space-y-6"
-            }>
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
               {filteredSpaces.map((space) => (
                 <SpaceCard 
                   key={space.id} 
@@ -324,13 +219,13 @@ const Spaces = () => {
                   <h3 className="text-lg font-medium mb-2">No spaces found</h3>
                   <p>Try adjusting your filters or search criteria</p>
                 </div>
-                <Button variant="outline" onClick={() => {
-                  setSearchTerm("");
-                  setSpaceType("all-types");
-                  setLocation("");
-                  setCapacity("any-size");
-                  setPriceRange([0, 200]);
-                }}>
+                <Button 
+                  variant="outline" 
+                  onClick={() => {
+                    setSpaceType("");
+                    setCapacity("");
+                  }}
+                >
                   Clear All Filters
                 </Button>
               </div>

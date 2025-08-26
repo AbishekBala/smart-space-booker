@@ -9,7 +9,7 @@ import Footer from "@/components/Footer";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 import { useAuth } from "@/hooks/use-auth";
 import { Eye, EyeOff, Lock, User } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 const Login = () => {
   // Scroll to top when component mounts
@@ -159,9 +159,11 @@ const Login = () => {
           <div className="text-center text-sm text-muted-foreground">
             <p>
               Don't have an account?{" "}
-              <Button variant="link" className="p-0 h-auto text-primary">
-                Contact us to get started
-              </Button>
+              <Link to="/contact">
+                <Button variant="link" className="p-0 h-auto text-primary">
+                  Contact us to get started
+                </Button>
+              </Link>
             </p>
           </div>
         </div>

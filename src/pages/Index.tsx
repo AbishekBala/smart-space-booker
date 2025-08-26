@@ -81,7 +81,7 @@ const Index = () => {
     }
   };
   
-  const featuredSpaces = [
+  const allSpaces = [
     {
       id: "1",
       name: "Executive Office Suite",
@@ -90,7 +90,8 @@ const Index = () => {
       location: "Downtown",
       price: 75,
       amenities: ["WiFi", "All Day Access", "Printer Access"],
-      description: "Executive suite with modern amenities perfect for professional and private local business."
+      description: "Executive suite with modern amenities perfect for professional and private local business.",
+      featured: true
     },
     {
       id: "2",
@@ -100,7 +101,8 @@ const Index = () => {
       location: "Downtown",
       price: 120,
       amenities: ["WiFi", "Video Conferencing", "Whiteboard"],
-      description: "Professional space perfect for conferences and executive meetings."
+      description: "Professional space perfect for conferences and executive meetings.",
+      featured: true
     },
     {
       id: "3",
@@ -110,9 +112,47 @@ const Index = () => {
       location: "Tech Hub",
       price: 25,
       amenities: ["WiFi", "Coffee Bar", "Phone Booths"],
-      description: "Flexible workspace perfect for individuals and small teams."
+      description: "Flexible workspace perfect for individuals and small teams.",
+      featured: true
+    },
+    {
+      id: "4",
+      name: "Premium Office",
+      type: "Private Office",
+      image: privateOfficeImage,
+      location: "Business District",
+      price: 90,
+      amenities: ["WiFi", "24/7 Access", "Meeting Room Access"],
+      description: "Spacious private office with premium amenities and great views.",
+      featured: false
+    },
+    {
+      id: "5",
+      name: "Team Meeting Room",
+      type: "Meeting Room",
+      image: meetingRoomImage,
+      location: "City Center",
+      price: 60,
+      amenities: ["WiFi", "Projector", "Whiteboard"],
+      description: "Ideal for team meetings and brainstorming sessions.",
+      featured: false
+    },
+    {
+      id: "6",
+      name: "Hot Desking",
+      type: "Coworking",
+      image: coworkingImage,
+      location: "Innovation Hub",
+      price: 20,
+      amenities: ["WiFi", "Free Coffee", "Community Events"],
+      description: "Flexible hot desking in a vibrant coworking community.",
+      featured: false
     }
   ];
+
+  const [showAllSpaces, setShowAllSpaces] = useState(false);
+  const featuredSpaces = allSpaces.filter(space => space.featured);
+  const otherSpaces = allSpaces.filter(space => !space.featured);
 
   return (
     <div className="min-h-screen bg-background">
@@ -147,11 +187,9 @@ const Index = () => {
                     <SelectValue placeholder="Asset Type" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="private-office">Private Office</SelectItem>
                     <SelectItem value="meeting-room">Meeting Room</SelectItem>
+                    <SelectItem value="private-office">Private Office</SelectItem>
                     <SelectItem value="coworking">Coworking Space</SelectItem>
-                    <SelectItem value="conference-room">Conference Room</SelectItem>
-                    <SelectItem value="creative-studio">Creative Studio</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -269,10 +307,28 @@ const Index = () => {
             </p>
           </div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
             {featuredSpaces.map((space) => (
               <SpaceCard key={space.id} {...space} />
             ))}
+          </div>
+          
+          {showAllSpaces && (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
+              {otherSpaces.map((space) => (
+                <SpaceCard key={space.id} {...space} />
+              ))}
+            </div>
+          )}
+          
+          <div className="text-center mt-4">
+            <Button 
+              variant="outline"
+              onClick={() => setShowAllSpaces(!showAllSpaces)}
+              className="border-blue-500 text-blue-500 hover:bg-blue-50"
+            >
+              {showAllSpaces ? 'Show Less' : 'Show More Spaces'}
+            </Button>
           </div>
         </div>
       </section>
