@@ -32,7 +32,6 @@ export default function CartPage() {
 
   const [name, setName] = useState('')
   const [email, setEmail] = useState('')
-  const [phone, setPhone] = useState('')
   const [showOtp, setShowOtp] = useState(false)
   const [otp, setOtp] = useState('')
   const [invoiceOpen, setInvoiceOpen] = useState(true)
@@ -42,12 +41,12 @@ export default function CartPage() {
   const total = +(subtotal + tax).toFixed(2)
 
   const handleContinue = () => {
-    if (!name.trim() || !email.trim() || !phone.trim()) {
-      toast({ title: 'Missing information', description: 'Please fill name, email and phone before continuing.', variant: 'destructive' })
+    if (!name.trim() || !email.trim()) {
+      toast({ title: 'Missing information', description: 'Please fill name and email before continuing.', variant: 'destructive' })
       return
     }
     setShowOtp(true)
-    toast({ title: 'OTP sent', description: 'A verification code was sent to your phone (simulated).' })
+    toast({ title: 'OTP sent', description: 'A verification code was sent to your email/phone (simulated).' })
   }
 
   const handleProceedToPay = () => {
@@ -142,10 +141,7 @@ export default function CartPage() {
                       <Label className="mb-1">Email</Label>
                       <Input value={email} onChange={(e) => setEmail(e.target.value)} placeholder="you@example.com" />
                     </div>
-                    <div>
-                      <Label className="mb-1">Phone</Label>
-                      <Input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 555-5555" />
-                    </div>
+                    {/* phone removed per requirement */}
 
                     {!showOtp ? (
                       <div className="mt-3">
