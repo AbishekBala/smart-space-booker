@@ -35,9 +35,11 @@ import {
   Trash2,
   Edit
 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
 
 const AdminDashboard = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
+  const { toast } = useToast();
   const [currentStep, setCurrentStep] = useState(1);
     const [savedAssets, setSavedAssets] = useState<Array<{
       id: string;
@@ -92,6 +94,25 @@ const AdminDashboard = () => {
   const [selectedTimeSlots, setSelectedTimeSlots] = useState<string[]>([]);
   const [selectedDate, setSelectedDate] = useState<Date | undefined>(new Date());
   const [selectedDailySlot, setSelectedDailySlot] = useState<string>("");
+  const [customStartTime, setCustomStartTime] = useState<string>("");
+  const [customEndTime, setCustomEndTime] = useState<string>("");
+  const [hourlyStartTime, setHourlyStartTime] = useState<string>("");
+  const [hourlyEndTime, setHourlyEndTime] = useState<string>("");
+  const [weekSchedule, setWeekSchedule] = useState<Array<{
+    day: string;
+    label: string;
+    enabled: boolean;
+    start: string;
+    end: string;
+  }>>([
+    { day: 'monday', label: 'Monday', enabled: true, start: '8:00', end: '16:00' },
+    { day: 'tuesday', label: 'Tuesday', enabled: true, start: '8:00', end: '16:00' },
+    { day: 'wednesday', label: 'Wednesday', enabled: true, start: '8:00', end: '16:00' },
+    { day: 'thursday', label: 'Thursday', enabled: true, start: '8:00', end: '16:00' },
+    { day: 'friday', label: 'Friday', enabled: true, start: '8:00', end: '16:00' },
+    { day: 'saturday', label: 'Saturday', enabled: false, start: '8:00', end: '16:00' },
+    { day: 'sunday', label: 'Sunday', enabled: false, start: '8:00', end: '16:00' },
+  ]);
   const [savedSlots, setSavedSlots] = useState<Array<{
     id: string;
     name: string;
@@ -153,7 +174,11 @@ const AdminDashboard = () => {
     setAvailabilityMode("daily");
     setSelectedTimeSlots([]);
     setSelectedDate(new Date());
-    setSelectedDailySlot("");
+  setSelectedDailySlot("");
+  setCustomStartTime('');
+  setCustomEndTime('');
+  setHourlyStartTime('');
+  setHourlyEndTime('');
     setSavedSlots([]);
     setIsEditing(false);
     setEditingAssetId(null);
@@ -486,7 +511,7 @@ const AdminDashboard = () => {
 
   const renderAvailability = () => {
     // Generate time slots (hourly from 9 AM to 6 PM)
-    const generateTimeSlots = () => {
+  const generateTimeSlots = () => {
       const slots = [];
       for (let hour = 9; hour <= 18; hour++) {
         const time12 = hour > 12 ? `${hour - 12}:00 PM` : hour === 12 ? '12:00 PM' : `${hour}:00 AM`;
@@ -508,44 +533,104 @@ const AdminDashboard = () => {
 
     const calculateSelectedHours = () => {
       if (availabilityMode === "daily") {
-        // For daily mode, calculate based on selected daily slot
-        switch (selectedDailySlot) {
-          case "morning": return 3;
-          case "afternoon": return 6;
-          case "fullday": return 9;
-          default: return 0;
+        // For daily mode, use custom start/end first if available
+        if (customStartTime && customEndTime) {
+          const start = parseInt(customStartTime.split(':')[0], 10);
+          const end = parseInt(customEndTime.split(':')[0], 10);
+          return Math.max(0, end - start);
         }
+        // Fallback to counting selectedTimeSlots
+        return selectedTimeSlots.length;
       } else {
         // For hourly mode, use the length of selected time slots
         return selectedTimeSlots.length;
       }
     };
 
+    const buildAutoName = () => {
+      if (availabilityMode === 'daily') {
+        const enabled = weekSchedule.filter(w => w.enabled);
+        const labels = enabled.map(e => e.label);
+        // if all enabled have same time range, show range
+        const sameRange = enabled.every(e => e.start === enabled[0].start && e.end === enabled[0].end);
+        const rangePart = sameRange ? ` ${formatTime(enabled[0].start)} - ${formatTime(enabled[0].end)}` : '';
+        const daysPart = labels.length === 7 ? 'Everyday' : labels.length >= 5 && labels.slice(0,5).map(l=>l).join('-') ? labels.join(', ') : labels.join(', ');
+        return `Schedule: ${daysPart}${rangePart}`;
+      }
+      // hourly
+      return `Hourly • ${selectedTimeSlots.length} ${selectedTimeSlots.length === 1 ? 'hour' : 'hours'}`;
+    };
+
+    const formatTime = (t: string) => {
+      const [h, m] = t.split(':').map(Number);
+      const ampm = h >= 12 ? 'PM' : 'AM';
+      const hour12 = h % 12 === 0 ? 12 : h % 12;
+      return `${hour12}:${m.toString().padStart(2,'0')} ${ampm}`;
+    };
+
     const saveSlot = () => {
-      if (availabilityMode === "daily" && !selectedDailySlot) {
-        alert('Please select a daily slot before saving.');
-        return;
+      if (availabilityMode === "daily") {
+        const enabledDays = weekSchedule.filter(w => w.enabled);
+        if (enabledDays.length === 0) {
+          toast({ title: 'No days enabled', description: 'Please enable at least one day before saving the daily schedule.' });
+          return;
+        }
+        for (const d of enabledDays) {
+          const start = parseInt(d.start.split(':')[0], 10);
+          const end = parseInt(d.end.split(':')[0], 10);
+          if (isNaN(start) || isNaN(end) || end <= start) {
+            alert(`Invalid time range for ${d.label}. Ensure end time is after start time.`);
+            return;
+          }
+        }
       }
-      
+
       if (availabilityMode === "hourly" && selectedTimeSlots.length === 0) {
-        alert('Please select at least one time slot before saving.');
+        toast({ title: 'No slots selected', description: 'Please select at least one time slot before saving.' });
         return;
       }
-      
-      setShowNameDialog(true);
+
+      // perform direct save with autogenerated name
+      const name = buildAutoName();
+
+      // For daily mode, encode weekSchedule into slots like 'monday|08:00-16:00'
+      const encodedSlots = availabilityMode === 'daily'
+        ? weekSchedule.filter(w => w.enabled).map(w => `${w.day}|${w.start}-${w.end}`)
+        : [...selectedTimeSlots];
+
+      const newSlot = {
+        id: Date.now().toString(),
+        name,
+        date: new Date(),
+        slots: encodedSlots,
+        type: availabilityMode as 'daily' | 'hourly',
+        hoursCount: calculateSelectedHours()
+      };
+
+      setSavedSlots(prev => [...prev, newSlot]);
+      setSelectedTimeSlots([]);
+      // keep weekSchedule as-is so user sees it after save
+      setSlotName("");
+  setShowNameDialog(false);
+  toast({ title: 'Saved', description: 'Slot configuration saved successfully!' });
     };
 
     const confirmSaveSlot = () => {
       if (!slotName.trim()) {
-        alert('Please enter a name for the slot configuration.');
+        toast({ title: 'Name required', description: 'Please enter a name for the slot configuration.' });
         return;
       }
+
+      // For daily mode, encode weekSchedule into slots like 'monday|08:00-16:00'
+      const encodedSlots = availabilityMode === 'daily'
+        ? weekSchedule.filter(w => w.enabled).map(w => `${w.day}|${w.start}-${w.end}`)
+        : [...selectedTimeSlots];
 
       const newSlot = {
         id: Date.now().toString(),
         name: slotName.trim(),
         date: new Date(),
-        slots: [...selectedTimeSlots],
+        slots: encodedSlots,
         type: availabilityMode as 'daily' | 'hourly',
         hoursCount: calculateSelectedHours()
       };
@@ -553,8 +638,8 @@ const AdminDashboard = () => {
       setSavedSlots(prev => [...prev, newSlot]);
       setSelectedTimeSlots([]);
       setSlotName("");
-      setShowNameDialog(false);
-      alert('Slot configuration saved successfully!');
+  setShowNameDialog(false);
+  toast({ title: 'Saved', description: 'Slot configuration saved successfully!' });
     };
 
     const cancelSaveSlot = () => {
@@ -569,20 +654,44 @@ const AdminDashboard = () => {
     };
 
     const loadSlot = (slot: typeof savedSlots[0]) => {
-      setSelectedTimeSlots(slot.slots);
       setAvailabilityMode(slot.type);
-      
-      // If it's a daily slot, determine which daily slot was selected based on the time slots
       if (slot.type === 'daily') {
-        if (slot.slots.length === 3 && slot.slots.includes("9:00")) {
-          setSelectedDailySlot("morning");
-        } else if (slot.slots.length === 6 && slot.slots.includes("12:00") && slot.slots.includes("17:00")) {
-          setSelectedDailySlot("afternoon");
-        } else if (slot.slots.length >= 9) {
-          setSelectedDailySlot("fullday");
+        // Decode encoded week schedule if present (format: day|HH:MM-HH:MM)
+        const decoded = weekSchedule.map(ws => ({ ...ws }));
+        let matched = false;
+        slot.slots.forEach(s => {
+          if (typeof s === 'string' && s.includes('|') && s.includes('-')) {
+            const [day, range] = s.split('|');
+            const [start, end] = range.split('-');
+            const idx = decoded.findIndex(d => d.day === day);
+            if (idx !== -1) {
+              decoded[idx].enabled = true;
+              decoded[idx].start = start;
+              decoded[idx].end = end;
+              matched = true;
+            }
+          }
+        });
+        if (matched) {
+          setWeekSchedule(decoded);
+          // Also build selectedTimeSlots as union of first enabled day's slots for preview
+          const firstEnabled = decoded.find(d => d.enabled);
+          if (firstEnabled) {
+            const start = parseInt(firstEnabled.start.split(':')[0], 10);
+            const end = parseInt(firstEnabled.end.split(':')[0], 10);
+            const rangeSlots: string[] = [];
+            for (let h = start; h < end; h++) rangeSlots.push(`${h}:00`);
+            setSelectedTimeSlots(rangeSlots);
+          } else {
+            setSelectedTimeSlots([]);
+          }
+        } else {
+          // Backwards compatibility: previous format was array of hour strings
+          setSelectedTimeSlots(slot.slots as string[]);
         }
       } else {
-        setSelectedDailySlot("");
+        // hourly
+        setSelectedTimeSlots(slot.slots as string[]);
       }
     };
 
@@ -603,6 +712,8 @@ const AdminDashboard = () => {
                   setAvailabilityMode("daily");
                   setSelectedTimeSlots([]);
                   setSelectedDailySlot("");
+                  setCustomStartTime('');
+                  setCustomEndTime('');
                 }}
               >
                 Daily Slots
@@ -614,6 +725,8 @@ const AdminDashboard = () => {
                   setAvailabilityMode("hourly");
                   setSelectedTimeSlots([]);
                   setSelectedDailySlot("");
+                  setCustomStartTime('');
+                  setCustomEndTime('');
                 }}
               >
                 Hourly Slots
@@ -635,66 +748,121 @@ const AdminDashboard = () => {
                 </div>
 
                 {availabilityMode === "daily" ? (
-                  /* Daily Slots - Full Day Options */
+                  /* Weekly Schedule Table */
                   <div className="space-y-3">
-                    <div className="grid grid-cols-1 gap-3">
-                      {[
-                        { value: "morning", label: "Morning (9:00 AM - 12:00 PM)", hours: "3 hours", slots: ["9:00", "10:00", "11:00"] },
-                        { value: "afternoon", label: "Afternoon (12:00 PM - 6:00 PM)", hours: "6 hours", slots: ["12:00", "13:00", "14:00", "15:00", "16:00", "17:00"] },
-                        { value: "fullday", label: "Full Day (9:00 AM - 6:00 PM)", hours: "9 hours", slots: timeSlots.map(s => s.value) }
-                      ].map((slot) => (
-                        <div
-                          key={slot.value}
-                          onClick={() => {
-                            setSelectedDailySlot(slot.value);
-                            setSelectedTimeSlots(slot.slots);
-                          }}
-                          className={`flex items-center justify-between p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                            selectedDailySlot === slot.value
-                              ? 'border-blue-500 bg-blue-50'
-                              : 'border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                          }`}
-                        >
-                          <div>
-                            <h4 className={`font-medium ${
-                              selectedDailySlot === slot.value ? 'text-blue-900' : 'text-gray-900'
-                            }`}>{slot.label}</h4>
-                            <p className={`text-sm ${
-                              selectedDailySlot === slot.value ? 'text-blue-700' : 'text-gray-500'
-                            }`}>{slot.hours}</p>
-                          </div>
-                          <div className={`w-5 h-5 border-2 rounded-full flex items-center justify-center transition-all ${
-                            selectedDailySlot === slot.value
-                              ? 'border-blue-500 bg-blue-500'
-                              : 'border-gray-300'
-                          }`}>
-                            {selectedDailySlot === slot.value && (
-                              <div className="w-2 h-2 bg-white rounded-full"></div>
-                            )}
-                          </div>
-                        </div>
-                      ))}
+                    <div className="text-sm text-gray-600 mb-2">Configure weekly availability. Enable days and set start/end times.</div>
+                    <div className="overflow-x-auto">
+                      <table className="w-full table-auto border-collapse">
+                        <thead>
+                          <tr className="text-left text-sm text-gray-600">
+                            <th className="p-2">Day</th>
+                            <th className="p-2">Start Time</th>
+                            <th className="p-2">End Time</th>
+                            <th className="p-2">Enabled</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {weekSchedule.map((row, idx) => (
+                            <tr key={row.day} className="border-t">
+                              <td className="p-2 align-middle">{row.label}</td>
+                              <td className="p-2">
+                                <Select value={row.start} onValueChange={(val) => {
+                                  setWeekSchedule(prev => prev.map((r, i) => i === idx ? { ...r, start: val } : r));
+                                }}>
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {timeSlots.slice(0, -1).map(ts => (
+                                      <SelectItem key={ts.value} value={ts.value}>{ts.label}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                              <td className="p-2">
+                                <Select value={row.end} onValueChange={(val) => {
+                                  setWeekSchedule(prev => prev.map((r, i) => i === idx ? { ...r, end: val } : r));
+                                }}>
+                                  <SelectTrigger>
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {timeSlots.slice(1).map(ts => (
+                                      <SelectItem key={ts.value} value={ts.value}>{ts.label}</SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </td>
+                              <td className="p-2">
+                                <input
+                                  type="checkbox"
+                                  checked={row.enabled}
+                                  onChange={(e) => {
+                                    const on = e.target.checked;
+                                    setWeekSchedule(prev => prev.map((r, i) => i === idx ? { ...r, enabled: on } : r));
+                                  }}
+                                />
+                              </td>
+                            </tr>
+                          ))}
+                        </tbody>
+                      </table>
                     </div>
                   </div>
                 ) : (
-                  /* Hourly Slots - Individual Hour Selection */
-                  <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-6 gap-2">
-                    {timeSlots.map((slot) => (
-                      <button
-                        key={slot.value}
-                        onClick={() => toggleTimeSlot(slot.value)}
-                        className={`p-3 rounded-lg border-2 text-sm font-medium transition-all ${
-                          selectedTimeSlots.includes(slot.value)
-                            ? 'border-blue-500 bg-blue-500 text-white'
-                            : 'border-gray-200 bg-white text-gray-700 hover:border-blue-300 hover:bg-blue-50'
-                        }`}
-                      >
-                        {selectedTimeSlots.includes(slot.value) && (
-                          <Check className="h-3 w-3 mx-auto mb-1" />
-                        )}
-                        {slot.label}
-                      </button>
-                    ))}
+                  /* Hourly Slots - From/To selects */
+                  <div className="space-y-3">
+                    <div className="text-sm text-gray-600 mb-2">Select hourly range (from → to)</div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                      <div>
+                        <Label>From</Label>
+                        <Select value={hourlyStartTime} onValueChange={(val) => {
+                          setHourlyStartTime(val);
+                          if (hourlyEndTime) {
+                            const start = parseInt(val.split(':')[0], 10);
+                            const end = parseInt(hourlyEndTime.split(':')[0], 10);
+                            if (!isNaN(start) && !isNaN(end) && end > start) {
+                              const rangeSlots: string[] = [];
+                              for (let h = start; h < end; h++) rangeSlots.push(`${h}:00`);
+                              setSelectedTimeSlots(rangeSlots);
+                            }
+                          }
+                        }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select from" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeSlots.slice(0, -1).map(ts => (
+                              <SelectItem key={ts.value} value={ts.value}>{ts.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                      <div>
+                        <Label>To</Label>
+                        <Select value={hourlyEndTime} onValueChange={(val) => {
+                          setHourlyEndTime(val);
+                          if (hourlyStartTime) {
+                            const start = parseInt(hourlyStartTime.split(':')[0], 10);
+                            const end = parseInt(val.split(':')[0], 10);
+                            if (!isNaN(start) && !isNaN(end) && end > start) {
+                              const rangeSlots: string[] = [];
+                              for (let h = start; h < end; h++) rangeSlots.push(`${h}:00`);
+                              setSelectedTimeSlots(rangeSlots);
+                            }
+                          }
+                        }}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select to" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {timeSlots.slice(1).map(ts => (
+                              <SelectItem key={ts.value} value={ts.value}>{ts.label}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
                   </div>
                 )}
 
@@ -703,8 +871,8 @@ const AdminDashboard = () => {
                   <Button
                     onClick={saveSlot}
                     disabled={
-                      (availabilityMode === "daily" && !selectedDailySlot) ||
-                      (availabilityMode === "hourly" && selectedTimeSlots.length === 0)
+                      (availabilityMode === 'daily' && weekSchedule.filter(w => w.enabled).length === 0) ||
+                      (availabilityMode === 'hourly' && selectedTimeSlots.length === 0)
                     }
                     className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
                   >
@@ -1123,7 +1291,7 @@ const AdminDashboard = () => {
 
         {/* Asset Details Dialog */}
         <Dialog open={showAssetDialog} onOpenChange={setShowAssetDialog}>
-          <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto">
+    <DialogContent className="max-w-5xl max-h-[85vh] overflow-y-auto">
             {assetToView && (
               <div className="space-y-4">
                 <div className="h-56 w-full bg-gray-100 rounded flex items-center justify-center">
@@ -1188,7 +1356,7 @@ const AdminDashboard = () => {
 
         {/* Edit Asset Dialog with Section Tabs */}
         <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
-          <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogContent className="max-w-6xl max-h-[95vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle className="text-xl">{isEditing ? 'Edit Asset' : 'Create Asset'}</DialogTitle>
               <DialogDescription>Update the selected section and click Save below.</DialogDescription>
