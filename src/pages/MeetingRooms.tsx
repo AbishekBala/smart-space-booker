@@ -10,6 +10,7 @@ import { format, addDays, isSameDay, addHours, parseISO, isWithinInterval, addMo
 import { Calendar as CalendarIcon, ChevronLeft, ChevronRight, Clock, Star, MapPin, Users, Video, Wifi, Monitor, Printer, Lock, Power, CheckIcon } from "lucide-react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
+import { useNavigate } from 'react-router-dom';
 import { useToast } from "@/hooks/use-toast";
 import { useScrollToTop } from "@/hooks/use-scroll-to-top";
 
@@ -40,6 +41,7 @@ const MeetingRooms = () => {
   const [selectedSlots, setSelectedSlots] = useState<BookingSlot[]>([]);
   const [currentMonth, setCurrentMonth] = useState<Date>(new Date());
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   const meetingRooms: Room[] = [
     {
@@ -65,45 +67,6 @@ const MeetingRooms = () => {
       type: "Conference Room",
       capacity: "12",
       amenities: ["Premium AV Equipment", "75\" Interactive Display", "Recording Equipment", "Catering Available", "Video Conferencing"]
-    }
-  ];
-
-  const suggestedWorkspaces: Room[] = [
-    {
-      id: 3,
-      name: "Executive Meeting Suite",
-      image: "/src/assets/meeting-room.jpg",
-      description: "A premium suite for executive meetings, equipped with state-of-the-art tech.",
-      price: 180,
-      capacity: "10",
-      amenities: ["8K Display", "Video Conferencing", "Catering"],
-      rating: 5.0,
-      reviews: 78,
-      type: "Meeting Room"
-    },
-    {
-      id: 4,
-      name: "Collaborative Hub",
-      image: "/src/assets/meeting-room.jpg",
-      description: "A dynamic space designed for team collaboration and workshops.",
-      price: 95,
-      capacity: "15",
-      amenities: ["Interactive Whiteboard", "High-speed WiFi", "Coffee & Refreshments"],
-      rating: 4.9,
-      reviews: 150,
-      type: "Meeting Room"
-    },
-    {
-      id: 5,
-      name: "Focus Room",
-      image: "/src/assets/meeting-room.jpg",
-      description: "A quiet, private room perfect for focused work or small team discussions.",
-      price: 60,
-      capacity: "6",
-      amenities: ["Soundproofing", "HD Monitor", "Printer Access"],
-      rating: 4.8,
-      reviews: 95,
-      type: "Meeting Room"
     }
   ];
 
@@ -168,31 +131,14 @@ const MeetingRooms = () => {
       });
       return;
     }
-
-    // Group slots by room
-    const bookingsByRoom = selectedSlots.reduce((acc, slot) => {
-      if (!acc[slot.roomId!]) {
-        acc[slot.roomId!] = [];
+    // Navigate to cart page with booking data
+    navigate('/cart', {
+      state: {
+        slots: selectedSlots.map(s => ({ id: s.id, startTime: s.startTime.toISOString(), endTime: s.endTime.toISOString() })),
+        roomName: selectedRoom.name,
+        price: selectedRoom.price,
       }
-      acc[slot.roomId!].push(slot);
-      return acc;
-    }, {} as Record<number, BookingSlot[]>);
-
-    // Process bookings for each room
-    Object.entries(bookingsByRoom).forEach(([roomId, slots]) => {
-      const room = meetingRooms.find(r => r.id === parseInt(roomId));
-      const slotTimes = slots.map(slot =>
-        `${format(slot.startTime, 'h:mm a')} - ${format(slot.endTime, 'h:mm a')}`
-      ).join('\n');
-
-      toast({
-        title: `Booking Confirmed for ${room?.name}`,
-        description: `You've booked the following time slots:\n${slotTimes}`,
-      });
     });
-
-    // Clear selections after booking
-    setSelectedSlots([]);
   };
 
   const totalPrice = selectedSlots.length * selectedRoom.price;
@@ -223,17 +169,17 @@ const MeetingRooms = () => {
                 </div>
 
                 {/* Calendar */}
-                <div className="md:w-1/2 flex items-center justify-center">
+                <div className="md:w-1/2">
                   <Calendar
                     mode="single"
                     selected={selectedDate}
                     onSelect={handleDateSelect}
-                    className="rounded-md border p-4"
+                    className="rounded-md border p-4 w-full"
                     disabled={(date) => date < new Date()}
                   />
                 </div>
               </div>
-
+              
               {/* Thumbnail Gallery */}
               <div className="flex gap-3">
                 {[selectedRoom.image, "/src/assets/coworking-space.jpg", "/src/assets/meeting-room.jpg"].map((img, idx) => (
@@ -284,8 +230,8 @@ const MeetingRooms = () => {
                         <h2 className="text-2xl font-bold">${selectedRoom.price}<span className="text-base font-normal text-muted-foreground">/hour</span></h2>
                       </div>
                       <div className="text-right">
-                        <div className="text-sm text-muted-foreground">Capacity</div>
                         <div className="font-medium text-lg">{selectedRoom.capacity}</div>
+                        <div className="text-sm text-muted-foreground">people</div>
                       </div>
                     </div>
 
@@ -299,11 +245,14 @@ const MeetingRooms = () => {
                             <Button
                               key={idx}
                               variant={isSelected ? "default" : "outline"}
-                              className={`h-14 flex flex-col items-center justify-center p-2 ${isSelected ? 'bg-green-100 hover:bg-green-200 text-green-800 border-green-300' : ''}`}
+                              className="h-14 flex flex-col items-center justify-center p-2"
                               onClick={() => handleSlotClick(timeSlot, selectedRoom.id)}
                             >
                               <span className="text-sm font-medium">
-                                {format(timeSlot.startTime, 'h')}-{format(timeSlot.endTime, 'h a')}
+                                {format(timeSlot.startTime, 'h a')}
+                              </span>
+                              <span className="text-xs text-muted-foreground">
+                                {format(timeSlot.endTime, 'h a')}
                               </span>
                             </Button>
                           );
@@ -325,8 +274,8 @@ const MeetingRooms = () => {
                       </div>
                     </div>
 
-                    <Button
-                      className="w-full h-12 text-base font-medium"
+                    <Button 
+                      className="w-full h-12 text-base font-medium" 
                       size="lg"
                       onClick={handleBookNow}
                       disabled={selectedSlots.length === 0}
@@ -337,45 +286,6 @@ const MeetingRooms = () => {
                 </Card>
               </div>
             </div>
-          </div>
-        </div>
-
-        {/* Suggested Workspaces */}
-        <div className="max-w-7xl mx-auto mt-16">
-          <div className="flex justify-between items-center mb-6">
-            <h2 className="text-2xl font-semibold">Suggested More Meeting Spaces</h2>
-            <Button variant="outline">See More <ChevronRight className="h-4 w-4 ml-2" /></Button>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {suggestedWorkspaces.map((room) => (
-              <Card key={room.id} className="flex flex-col rounded-lg overflow-hidden border shadow-sm hover:shadow-lg transition-shadow">
-                <img
-                  src={room.image}
-                  alt={room.name}
-                  className="w-full h-48 object-cover"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = "/placeholder.svg";
-                  }}
-                />
-                <CardContent className="p-6 flex flex-col flex-grow">
-                  <h3 className="font-semibold text-xl mb-1">{room.name}</h3>
-                  <p className="text-muted-foreground mb-3">${room.price}/hr</p>
-                  <p className="text-sm text-muted-foreground mb-4 flex-grow">{room.description}</p>
-
-                  <div className="flex flex-wrap gap-2 mb-6">
-                    {room.amenities.slice(0, 3).map((amenity, idx) => (
-                      <div key={idx} className="flex items-center gap-2 bg-gray-100 rounded-full px-3 py-1 text-xs text-gray-600">
-                        <Clock className="h-3 w-3" />
-                        <span>{amenity}</span>
-                      </div>
-                    ))}
-                  </div>
-
-                  <Button className="w-full mt-auto bg-blue-600 hover:bg-blue-700">Book Now</Button>
-                </CardContent>
-              </Card>
-            ))}
           </div>
         </div>
       </main>

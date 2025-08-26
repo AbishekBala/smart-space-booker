@@ -7,6 +7,7 @@ import ScrollToTopButton from "@/components/ScrollToTopButton";
 import Index from "./pages/Index";
 import OfficeBooking from "./pages/OfficeBooking";
 import MeetingRooms from "./pages/MeetingRooms";
+import Cart from "./pages/Cart";
 import Coworking from "./pages/Coworking";
 import About from "./pages/About";
 import Contact from "./pages/Contact";
@@ -31,6 +32,7 @@ const AppContent = () => {
         <Route path="/admin" element={<AdminDashboard />} />
         <Route path="/office-booking" element={<OfficeBooking />} />
         <Route path="/meeting-rooms" element={<MeetingRooms />} />
+  <Route path="/cart" element={<Cart />} />
         <Route path="/coworking" element={<Coworking />} />
         <Route path="/about" element={<About />} />
         <Route path="/contact" element={<Contact />} />
