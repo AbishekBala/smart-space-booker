@@ -110,7 +110,7 @@ const AdminDashboard = () => {
     capacity: "",
     description: "",
     basePrice: "",
-    currency: "USD",
+  currency: "INR",
   });
   const [isEditing, setIsEditing] = useState(false);
   const [editingAssetId, setEditingAssetId] = useState<string | null>(null);
@@ -146,7 +146,7 @@ const AdminDashboard = () => {
       capacity: "",
       description: "",
       basePrice: "",
-      currency: "USD",
+  currency: "INR",
     });
     setSelectedAmenities([]);
     setUploadedImages([]);
