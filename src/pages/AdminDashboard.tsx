@@ -174,6 +174,11 @@ const AdminDashboard = () => {
     createdAt: Date;
   }>>([]);
 
+  // Validation dialog states
+  const [showSaveConfirmDialog, setShowSaveConfirmDialog] = useState(false);
+  const [showDeleteConfirmDialog, setShowDeleteConfirmDialog] = useState(false);
+  const [assetToDelete, setAssetToDelete] = useState<string | null>(null);
+
   const resetAssetBuilder = () => {
     setAssetForm({
       name: "",
@@ -201,6 +206,57 @@ const AdminDashboard = () => {
   };
 
   const handleSaveAsset = () => {
+    // Validation
+    if (!assetForm.name.trim()) {
+      toast({
+        title: "Validation Error",
+        description: "Asset name is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!assetForm.type) {
+      toast({
+        title: "Validation Error", 
+        description: "Asset type is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!assetForm.location) {
+      toast({
+        title: "Validation Error",
+        description: "Location is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!assetForm.capacity) {
+      toast({
+        title: "Validation Error",
+        description: "Capacity is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    if (!assetForm.basePrice || parseFloat(assetForm.basePrice) <= 0) {
+      toast({
+        title: "Validation Error",
+        description: "Valid base price is required.",
+        variant: "destructive"
+      });
+      return;
+    }
+    
+    // Show confirmation dialog
+    setShowSaveConfirmDialog(true);
+  };
+
+  const confirmSaveAsset = () => {
     const assetId = isEditing && editingAssetId ? editingAssetId : Date.now().toString();
     const newAsset = {
       id: assetId,
@@ -225,7 +281,30 @@ const AdminDashboard = () => {
 
     resetAssetBuilder();
     setActiveTab("assets");
-    alert(isEditing ? "Asset updated successfully!" : "Asset created successfully!");
+    setShowSaveConfirmDialog(false);
+    
+    toast({
+      title: "Success",
+      description: isEditing ? "Asset updated successfully!" : "Asset created successfully!",
+    });
+  };
+
+  const handleDeleteAsset = (assetId: string) => {
+    setAssetToDelete(assetId);
+    setShowDeleteConfirmDialog(true);
+  };
+
+  const confirmDeleteAsset = () => {
+    if (assetToDelete) {
+      setSavedAssets(prev => prev.filter(a => a.id !== assetToDelete));
+      setAssetToDelete(null);
+      setShowDeleteConfirmDialog(false);
+      
+      toast({
+        title: "Success",
+        description: "Asset deleted successfully!",
+      });
+    }
   };
 
   const handleEditAsset = (assetId: string) => {
@@ -939,20 +1018,7 @@ const AdminDashboard = () => {
                   </div>
                 )}
 
-                {/* Save Slot Button */}
-                <div className="mt-6 flex justify-center">
-                  <Button
-                    onClick={saveSlot}
-                    disabled={
-                      (availabilityMode === 'daily' && weekSchedule.filter(w => w.enabled).length === 0) ||
-                      (availabilityMode === 'hourly' && selectedTimeSlots.length === 0)
-                    }
-                    className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
-                  >
-                    <Save className="h-4 w-4 mr-2" />
-                    Save Slot Configuration
-                  </Button>
-                </div>
+                {/* Save Slot Button removed per requirement */}
               </div>
             </div>
           </div>
@@ -1295,9 +1361,14 @@ const AdminDashboard = () => {
                           <CardTitle className="text-lg">{asset.name}</CardTitle>
                           <CardDescription className="text-xs capitalize">{asset.type.replace('-', ' ')}</CardDescription>
                         </div>
-                        <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); handleEditAsset(asset.id); }}>
-                          <Edit className="h-4 w-4 mr-1" /> Edit
-                        </Button>
+                        <div className="flex gap-1">
+                          <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); handleEditAsset(asset.id); }}>
+                            <Edit className="h-4 w-4 mr-1" /> Edit
+                          </Button>
+                          <Button size="sm" variant="outline" onClick={(e) => { e.stopPropagation(); handleDeleteAsset(asset.id); }}>
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
                       </div>
                     </CardHeader>
                     <CardContent className="space-y-3">
@@ -1613,6 +1684,46 @@ const AdminDashboard = () => {
 
             <DialogFooter>
               <Button variant="outline" onClick={() => setShowEditDialog(false)}>Close</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Save Confirmation Dialog */}
+        <Dialog open={showSaveConfirmDialog} onOpenChange={setShowSaveConfirmDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Confirm Save</DialogTitle>
+              <DialogDescription>
+                {isEditing ? "Are you sure you want to update this asset?" : "Are you sure you want to create this asset?"}
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowSaveConfirmDialog(false)}>
+                Cancel
+              </Button>
+              <Button onClick={confirmSaveAsset}>
+                {isEditing ? "Update Asset" : "Create Asset"}
+              </Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
+
+        {/* Delete Confirmation Dialog */}
+        <Dialog open={showDeleteConfirmDialog} onOpenChange={setShowDeleteConfirmDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <DialogHeader>
+              <DialogTitle>Confirm Delete</DialogTitle>
+              <DialogDescription>
+                Are you sure you want to delete this asset? This action cannot be undone.
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="outline" onClick={() => setShowDeleteConfirmDialog(false)}>
+                Cancel
+              </Button>
+              <Button variant="destructive" onClick={confirmDeleteAsset}>
+                Delete Asset
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
