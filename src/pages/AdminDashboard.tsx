@@ -24,6 +24,7 @@ import {
   Coffee,
   User,
   Calendar as CalendarIcon,
+  Calendar,
   Upload,
   X,
   ChevronLeft,
@@ -158,6 +159,20 @@ const AdminDashboard = () => {
   }>(null);
   const [showEditDialog, setShowEditDialog] = useState(false);
   const [activeEditTab, setActiveEditTab] = useState<'basic' | 'amenities' | 'availability'>('basic');
+  const [showUnavailabilityDialog, setShowUnavailabilityDialog] = useState(false);
+  const [unavailabilityForm, setUnavailabilityForm] = useState({
+    assetId: "",
+    date: "",
+    reason: ""
+  });
+  const [savedUnavailability, setSavedUnavailability] = useState<Array<{
+    id: string;
+    assetId: string;
+    assetName: string;
+    date: string;
+    reason: string;
+    createdAt: Date;
+  }>>([]);
 
   const resetAssetBuilder = () => {
     setAssetForm({
@@ -236,6 +251,63 @@ const AdminDashboard = () => {
     setShowEditDialog(true);
   };
 
+  const resetUnavailabilityForm = () => {
+    setUnavailabilityForm({
+      assetId: "",
+      date: "",
+      reason: ""
+    });
+  };
+
+  const handleSaveUnavailability = () => {
+    if (!unavailabilityForm.assetId || !unavailabilityForm.date || !unavailabilityForm.reason.trim()) {
+      toast({
+        title: "Missing information",
+        description: "Please fill all fields before saving.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const selectedAsset = savedAssets.find(a => a.id === unavailabilityForm.assetId);
+    if (!selectedAsset) {
+      toast({
+        title: "Asset not found",
+        description: "Selected asset not found.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    const newUnavailability = {
+      id: Date.now().toString(),
+      assetId: unavailabilityForm.assetId,
+      assetName: selectedAsset.name,
+      date: unavailabilityForm.date,
+      reason: unavailabilityForm.reason.trim(),
+      createdAt: new Date()
+    };
+
+    setSavedUnavailability(prev => [...prev, newUnavailability]);
+    resetUnavailabilityForm();
+    setShowUnavailabilityDialog(false);
+    
+    toast({
+      title: "Unavailability saved",
+      description: `${selectedAsset.name} marked as unavailable on ${unavailabilityForm.date}.`
+    });
+  };
+
+  const deleteUnavailability = (unavailabilityId: string) => {
+    if (confirm('Are you sure you want to delete this unavailability record?')) {
+      setSavedUnavailability(prev => prev.filter(u => u.id !== unavailabilityId));
+      toast({
+        title: "Unavailability deleted",
+        description: "Unavailability record has been removed."
+      });
+    }
+  };
+
   const sidebarItems = [
     { id: "dashboard", label: "Dashboard", icon: LayoutDashboard },
     { 
@@ -245,7 +317,8 @@ const AdminDashboard = () => {
       hasSubmenu: true,
       submenu: [
         { id: "assets", label: "Assets", icon: Settings },
-        { id: "create-asset", label: "Create New Asset", icon: Plus }
+        { id: "create-asset", label: "Create New Asset", icon: Plus },
+        { id: "unavailability", label: "Unavailability", icon: Calendar }
       ]
     },
   ];
@@ -1065,6 +1138,124 @@ const AdminDashboard = () => {
     </div>
   );
 
+  const renderUnavailability = () => (
+    <div className="space-y-6">
+      <div className="flex items-center justify-between">
+        <h1 className="text-2xl font-bold">Asset Unavailability</h1>
+        <Button
+          className="bg-blue-600 hover:bg-blue-700"
+          onClick={() => {
+            resetUnavailabilityForm();
+            setShowUnavailabilityDialog(true);
+          }}
+        >
+          <Plus className="h-5 w-5 mr-2" />
+          Add Unavailability
+        </Button>
+      </div>
+
+      {savedUnavailability.length === 0 ? (
+        <div className="flex items-center justify-center h-64">
+          <p className="text-gray-500">No unavailability records yet. Click "Add Unavailability" to create one.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {savedUnavailability.map(unavail => (
+            <Card key={unavail.id} className="hover:shadow-lg transition-shadow">
+              <CardHeader className="pb-2">
+                <div className="flex items-start justify-between">
+                  <div>
+                    <CardTitle className="text-lg">{unavail.assetName}</CardTitle>
+                    <CardDescription className="text-xs">{unavail.date}</CardDescription>
+                  </div>
+                  <Button 
+                    size="sm" 
+                    variant="outline" 
+                    onClick={() => deleteUnavailability(unavail.id)}
+                    className="text-red-600 hover:text-red-700"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                <div className="text-sm">
+                  <div className="font-medium text-gray-700">Reason:</div>
+                  <div className="text-gray-600">{unavail.reason}</div>
+                </div>
+                <div className="text-xs text-gray-500">
+                  Added on {unavail.createdAt.toLocaleDateString()}
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      {/* Unavailability Dialog */}
+      <Dialog open={showUnavailabilityDialog} onOpenChange={setShowUnavailabilityDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Add Asset Unavailability</DialogTitle>
+            <DialogDescription>
+              Mark an asset as unavailable for a specific date with a reason.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="space-y-2">
+              <Label htmlFor="asset-select">Select Asset *</Label>
+              <Select 
+                value={unavailabilityForm.assetId} 
+                onValueChange={(value) => setUnavailabilityForm(prev => ({ ...prev, assetId: value }))}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Choose an asset" />
+                </SelectTrigger>
+                <SelectContent>
+                  {savedAssets.map(asset => (
+                    <SelectItem key={asset.id} value={asset.id}>
+                      {asset.name} ({asset.type.replace('-', ' ')})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="unavail-date">Date *</Label>
+              <Input
+                id="unavail-date"
+                type="date"
+                value={unavailabilityForm.date}
+                min={new Date().toISOString().split('T')[0]}
+                onChange={(e) => setUnavailabilityForm(prev => ({ ...prev, date: e.target.value }))}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="unavail-reason">Reason *</Label>
+              <Textarea
+                id="unavail-reason"
+                placeholder="Enter reason for unavailability..."
+                value={unavailabilityForm.reason}
+                onChange={(e) => setUnavailabilityForm(prev => ({ ...prev, reason: e.target.value }))}
+                className="min-h-[80px]"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowUnavailabilityDialog(false)}>
+              Cancel
+            </Button>
+            <Button onClick={handleSaveUnavailability} className="bg-blue-600 hover:bg-blue-700">
+              Save Unavailability
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
@@ -1135,6 +1326,8 @@ const AdminDashboard = () => {
             )}
           </div>
         );
+      case "unavailability":
+        return renderUnavailability();
       case "create-asset":
         return (
           <div className="space-y-6">
